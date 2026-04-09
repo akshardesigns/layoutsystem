@@ -907,7 +907,8 @@
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
  <body class="h-full bg-neutral-50 text-neutral-900 font-body overflow-auto">
-  <div id="app" class="w-full min-h-full"><!-- Header -->
+  <div id="app" class="w-full min-h-full">
+   <!-- Header -->
    <div class="px-6 py-5 border-b border-neutral-200 flex items-center justify-between">
     <div>
      <p class="text-neutral-400 text-[10px] font-mono tracking-wider mb-2">By Akshardesign.id</p>
@@ -917,35 +918,46 @@
    </div><!-- Input Fields -->
    <div class="px-6 py-6 border-b border-white/5">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-[1200px] mx-auto">
-     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Judul (Headline)</label> <input type="text" id="inp_judul" value="BEYOND THE EDGE" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
+     <div class="col-span-full">
+      <label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Judul (Headline)</label> <input type="text" id="inp_judul" value="BEYOND THE EDGE" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
      </div>
-     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Sub Judul</label> <input type="text" id="inp_sub_judul" value="Exploring the invisible boundaries of modern creative culture" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
+     <div class="col-span-full">
+      <label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Sub Judul</label> <input type="text" id="inp_sub_judul" value="Exploring the invisible boundaries of modern creative culture" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
      </div>
-     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Deskripsi 1</label> <textarea id="inp_desc1" rows="2" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300 resize-none">A visual essay on the tension between minimalism and expression. We strip away the unnecessary to reveal what truly matters in design.</textarea>
+     <div class="col-span-full">
+      <label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Deskripsi 1</label> <textarea id="inp_desc1" rows="2" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300 resize-none">A visual essay on the tension between minimalism and expression. We strip away the unnecessary to reveal what truly matters in design.</textarea>
      </div>
-     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Deskripsi 2</label> <textarea id="inp_desc2" rows="2" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300 resize-none">Through careful composition and deliberate restraint, each element finds its purpose. Nothing is accidental — every pixel is intentional.</textarea>
+     <div class="col-span-full">
+      <label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Deskripsi 2</label> <textarea id="inp_desc2" rows="2" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300 resize-none">Through careful composition and deliberate restraint, each element finds its purpose. Nothing is accidental — every pixel is intentional.</textarea>
      </div>
-     <div><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Info Tambahan</label> <input type="text" id="inp_info" value="VOL. 03 — 2025 EDITION" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
+     <div>
+      <label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Info Tambahan</label> <input type="text" id="inp_info" value="VOL. 03 — 2025 EDITION" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
      </div>
-     <div><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Tagline</label> <input type="text" id="inp_tagline" value="FORM FOLLOWS FEELING" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
+     <div>
+      <label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Tagline</label> <input type="text" id="inp_tagline" value="FORM FOLLOWS FEELING" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
      </div>
-     <div><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Theme Color</label>
-      <div class="flex items-center gap-2"><input type="color" id="inp_color" value="#C8553D" class="w-8 h-8 rounded-lg"> <span id="color_label" class="text-[10px] font-mono text-neutral-500">#C8553D</span>
+     <div>
+      <label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Theme Color</label>
+      <div class="flex items-center gap-2">
+       <input type="color" id="inp_color" value="#C8553D" class="w-8 h-8 rounded-lg"> <span id="color_label" class="text-[10px] font-mono text-neutral-500">#C8553D</span>
       </div>
      </div>
-     <div><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Visual Hook</label>
-      <div id="drop_visual" class="drop-zone rounded-lg h-14 flex items-center justify-center gap-2 text-neutral-400 text-[10px] font-mono"><i data-lucide="image" style="width:12px;height:12px"></i> <span id="visual_label">Click to upload</span>
+     <div>
+      <label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Visual Hook</label>
+      <div id="drop_visual" class="drop-zone rounded-lg h-14 flex items-center justify-center gap-2 text-neutral-400 text-[10px] font-mono">
+       <i data-lucide="image" style="width:12px;height:12px"></i> <span id="visual_label">Click to upload</span>
       </div><input type="file" id="file_visual" accept="image/*" class="hidden">
      </div>
-     <div><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Brand Logo</label>
-      <div id="drop_logo" class="drop-zone rounded-lg h-14 flex items-center justify-center gap-2 text-neutral-400 text-[10px] font-mono"><i data-lucide="shapes" style="width:12px;height:12px"></i> <span id="logo_label">Click to upload</span>
+     <div>
+      <label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Brand Logo</label>
+      <div id="drop_logo" class="drop-zone rounded-lg h-14 flex items-center justify-center gap-2 text-neutral-400 text-[10px] font-mono">
+       <i data-lucide="shapes" style="width:12px;height:12px"></i> <span id="logo_label">Click to upload</span>
       </div><input type="file" id="file_logo" accept="image/*" class="hidden">
      </div>
     </div>
    </div><!-- Layout Selector -->
    <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50">
-    <div class="flex items-center gap-3">
-     <button id="prevBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-left" style="width:16px;height:16px;"></i></button>
+    <div class="flex items-center gap-3"><button id="prevBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-left" style="width:16px;height:16px;"></i></button>
      <div class="text-center min-w-20">
       <p id="layoutIndicator" class="text-[12px] font-semibold text-neutral-900">Layout 1</p>
       <p class="text-[10px] text-neutral-400 font-mono">1 / 9</p>
@@ -954,13 +966,15 @@
    </div><!-- Live Preview -->
    <div class="py-10 flex justify-center">
     <div class="poster-wrapper" id="posterWrapper">
-     <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;"><!-- Headline BG -->
+     <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
+      <!-- Headline BG -->
       <div class="headline-bg" id="p_headline" style="color:#C8553D;">
        BEYOND THE EDGE
       </div><!-- Hero Image -->
       <div class="hero-image-area" id="p_hero">
        <div class="w-full h-full flex items-center justify-center" style="background: #ffffff;" id="p_hero_placeholder">
-        <div class="text-center text-neutral-300"><i data-lucide="image" style="width:48px;height:48px;margin:0 auto;display:block"></i>
+        <div class="text-center text-neutral-300">
+         <i data-lucide="image" style="width:48px;height:48px;margin:0 auto;display:block"></i>
          <p class="text-xs font-mono mt-3 tracking-wider uppercase">Upload Visual Hook</p>
         </div>
        </div>
@@ -971,7 +985,8 @@
       <div class="tagline-area" id="p_tagline" style="color:#C8553D;">
        FORM FOLLOWS FEELING
       </div><!-- Info Bar -->
-      <div class="info-bar" id="p_info_bar"><span style="color:#1f2937;" id="p_info">VOL. 03 — 2025 EDITION</span>
+      <div class="info-bar" id="p_info_bar">
+       <span style="color:#1f2937;" id="p_info">VOL. 03 — 2025 EDITION</span>
        <div class="line" id="p_info_line" style="background:#e5e7eb;"></div>
       </div><!-- Two Column Text -->
       <div class="two-col-text">
@@ -983,13 +998,15 @@
        </div>
       </div><!-- Brand Area -->
       <div class="brand-area" id="p_brand">
-       <div id="p_logo_placeholder" class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(255,255,255,0.08);"><i data-lucide="hexagon" style="width:18px;height:18px;color:rgba(255,255,255,0.25)"></i>
+       <div id="p_logo_placeholder" class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(255,255,255,0.08);">
+        <i data-lucide="hexagon" style="width:18px;height:18px;color:rgba(255,255,255,0.25)"></i>
        </div>
       </div><!-- Layout 7: Top right line -->
       <div class="top-right-line"></div><!-- Layout 8: Bottom anchor line -->
       <div class="layout-8-anchor-line" id="p_layout8_line"></div>
      </div>
-     <div class="swipe-indicator right"><i data-lucide="chevron-right"></i>
+     <div class="swipe-indicator right">
+      <i data-lucide="chevron-right"></i>
      </div>
     </div>
    </div>
@@ -1111,6 +1128,54 @@
       ctx.fillText(line, x, y);
     }
 
+    // Helper: Measure text dimensions
+    function measureText(ctx, text, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let lines = [];
+      let line = '';
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+
+        if (metrics.width > maxWidth && n > 0) {
+          lines.push(line.trim());
+          line = words[n] + ' ';
+        } else {
+          line = testLine;
+        }
+      }
+      lines.push(line.trim());
+      return { lines, height: lines.length * lineHeight };
+    }
+
+    // Helper: Draw wrapped text with proper positioning
+    function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, align = 'left', startBaseline = true) {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+
+      ctx.textAlign = align;
+      ctx.textBaseline = startBaseline ? 'top' : 'alphabetic';
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line.trim(), x, currentY);
+          line = words[n] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+
+      if (line.trim()) {
+        ctx.fillText(line.trim(), x, currentY);
+      }
+    }
+
     // Download PNG
     document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
       const btn = document.getElementById('downloadPdfBtn');
@@ -1200,276 +1265,353 @@
           }
         }
 
-        // Get text content
+        // Get text content & color
         const color = document.getElementById('inp_color').value;
-        const judul = document.getElementById('p_headline').textContent;
-        const sub = document.getElementById('p_sub').textContent;
-        const info = document.getElementById('p_info').textContent;
-        const tagline = document.getElementById('p_tagline').textContent;
-        const desc1 = document.getElementById('p_desc1').textContent;
-        const desc2 = document.getElementById('p_desc2').textContent;
+        const judul = document.getElementById('p_headline').textContent.trim();
+        const sub = document.getElementById('p_sub').textContent.trim();
+        const info = document.getElementById('p_info').textContent.trim();
+        const tagline = document.getElementById('p_tagline').textContent.trim();
+        const desc1 = document.getElementById('p_desc1').textContent.trim();
+        const desc2 = document.getElementById('p_desc2').textContent.trim();
 
-        // Layout-specific positioning and text rendering - match CSS positioning exactly
+        // Layout-specific positioning - EXACT CSS matching
         if (currentLayout === 1) {
-          // LAYOUT 1 - CSS: top: 50px, headline centered
+          // LAYOUT 1 - Centered, full-width
+          // headline - top: 50px, centered, 138px
           ctx.fillStyle = color;
-          ctx.font = '900 138px Playfair Display';
-          wrapText(ctx, judul, 540, 180, 1000, 135, 'center');
+          ctx.font = 'bold 138px "Playfair Display", serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, judul, 540, 50, 1000, 138 * 0.9, 'center', true);
 
-          // tagline - CSS: bottom: 50px
-          ctx.fillStyle = color;
-          ctx.font = '13px Space Mono';
-          ctx.textAlign = 'left';
-          ctx.fillText(tagline, 40, 1300);
-
-          // sub-headline - CSS: top: 360px
+          // sub-headline - top: 360px, centered, 28px
           ctx.fillStyle = '#1f2937';
-          ctx.font = '700 28px DM Sans';
-          wrapText(ctx, sub, 540, 360, 1000, 34, 'center');
+          ctx.font = 'bold 28px "DM Sans", sans-serif';
+          drawWrappedText(ctx, sub, 540, 360, 1000, 34, 'center', true);
 
-          // info-bar - CSS: top: 1080px
+          // info-bar - top: 1080px, centered, 11px
           ctx.fillStyle = '#1f2937';
-          ctx.font = '11px Space Mono';
+          ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(info, 540, 1090);
+          ctx.textBaseline = 'top';
+          ctx.fillText(info, 540, 1080);
 
-          // two-col-text - CSS: top: 1130px
+          // two-col-text - top: 1130px
           ctx.fillStyle = '#374151';
-          ctx.font = '300 17px DM Sans';
-          wrapText(ctx, desc1, 60, 1130, 440, 28, 'left');
-          wrapText(ctx, desc2, 980, 1130, 440, 28, 'right');
+          ctx.font = '300 17px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, desc1, 60, 1130, 440, 28, 'left', true);
+          drawWrappedText(ctx, desc2, 1020, 1130, 440, 28, 'right', true);
+
+          // tagline - bottom: 50px = 1300px, left, 13px
+          ctx.fillStyle = color;
+          ctx.font = '13px "Space Mono", monospace';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(tagline, 40, 1350);
+
         } else if (currentLayout === 2) {
-          // LAYOUT 2 - 50-50 split, image on right
-          // headline - CSS: top: 750px, left: 40px, right: 50%
+          // LAYOUT 2 - 50/50 split, image right
+          // tagline - top: 40px, left, 12px
           ctx.fillStyle = color;
-          ctx.font = '900 88px Playfair Display';
-          wrapText(ctx, judul, 270, 760, 460, 100, 'left');
-
-          // tagline - CSS: top: 40px, left: 40px
-          ctx.fillStyle = color;
-          ctx.font = '12px Space Mono';
+          ctx.font = '12px "Space Mono", monospace';
           ctx.textAlign = 'left';
-          ctx.fillText(tagline, 40, 55);
+          ctx.textBaseline = 'top';
+          ctx.fillText(tagline, 40, 40);
 
-          // sub-headline - CSS: top: 950px, left: 40px, right: 50%
-          ctx.fillStyle = '#1f2937';
-          ctx.font = '700 20px DM Sans';
-          wrapText(ctx, sub, 270, 950, 460, 28, 'left');
+          // headline - top: 750px, left, 88px (left 40px, right 50%)
+          ctx.fillStyle = color;
+          ctx.font = 'bold 88px "Playfair Display", serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, judul, 40, 750, 460, 88 * 0.9, 'left', true);
 
-          // info-bar - CSS: bottom: 50px, right: 40px
+          // sub-headline - top: 950px, left, 20px
           ctx.fillStyle = '#1f2937';
-          ctx.font = '11px Space Mono';
+          ctx.font = 'bold 20px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, sub, 40, 950, 460, 24, 'left', true);
+
+          // two-col-text - top: 1020px, single column
+          ctx.fillStyle = '#374151';
+          ctx.font = '300 14px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, desc1, 40, 1020, 460, 20, 'left', true);
+          drawWrappedText(ctx, desc2, 40, 1070, 460, 20, 'left', true);
+
+          // info-bar - bottom: 50px = 1300px, right
+          ctx.fillStyle = '#1f2937';
+          ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'right';
-          ctx.fillText(info, 520, 1300);
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(info, 1040, 1350);
 
-          // two-col-text - CSS: top: 1020px, left: 40px, single column
-          ctx.fillStyle = '#374151';
-          ctx.font = '300 14px DM Sans';
-          wrapText(ctx, desc1, 60, 1020, 440, 20, 'left');
-          wrapText(ctx, desc2, 60, 1070, 440, 20, 'left');
+          // brand - bottom: 50px, left
+          // (logo handled separately)
+
         } else if (currentLayout === 3) {
-          // LAYOUT 3 - Full-width image top
-          // headline - CSS: top: 700px
-          ctx.fillStyle = color;
-          ctx.font = '900 120px Playfair Display';
-          wrapText(ctx, judul, 540, 720, 1000, 135, 'center');
+          // LAYOUT 3 - Full width image top
+          // hero-image-area - top: 20px (handled above)
 
-          // tagline - CSS: bottom: 40px, left: 40px
+          // tagline - bottom: 40px = 1310px, left, 11px
           ctx.fillStyle = color;
-          ctx.font = '11px Space Mono';
+          ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'left';
-          ctx.fillText(tagline, 40, 1300);
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(tagline, 40, 1350);
 
-          // sub-headline - CSS: top: 970px
-          ctx.fillStyle = '#1f2937';
-          ctx.font = '700 20px DM Sans';
-          wrapText(ctx, sub, 540, 980, 1000, 28, 'center');
+          // headline - top: 700px, centered, 120px
+          ctx.fillStyle = color;
+          ctx.font = 'bold 120px "Playfair Display", serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, judul, 540, 700, 1000, 120 * 0.9, 'center', true);
 
-          // info-bar - CSS: top: 650px
+          // sub-headline - top: 970px, centered, 20px
           ctx.fillStyle = '#1f2937';
-          ctx.font = '11px Space Mono';
+          ctx.font = 'bold 20px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, sub, 540, 970, 1000, 24, 'center', true);
+
+          // info-bar - top: 650px, centered
+          ctx.fillStyle = '#1f2937';
+          ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(info, 540, 665);
+          ctx.textBaseline = 'top';
+          ctx.fillText(info, 540, 650);
 
-          // two-col-text - CSS: top: 1060px, single column
+          // two-col-text - top: 1060px, centered
           ctx.fillStyle = '#374151';
-          ctx.font = '300 14px DM Sans';
-          wrapText(ctx, desc1, 540, 1060, 800, 20, 'center');
-          wrapText(ctx, desc2, 540, 1090, 800, 20, 'center');
+          ctx.font = '300 14px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, desc1, 540, 1060, 800, 20, 'center', true);
+          drawWrappedText(ctx, desc2, 540, 1090, 800, 20, 'center', true);
+
         } else if (currentLayout === 4) {
-          // LAYOUT 4 - Diagonal split
-          // headline - CSS: top: 400px, left: 55%, right: 40px
+          // LAYOUT 4 - Diagonal: image left, text right
+          // image: top: 40px, left: 40px, width: 45%, height: 800px
+
+          // tagline - top: 40px, left: 55% = 594px, 12px
           ctx.fillStyle = color;
-          ctx.font = '900 96px Playfair Display';
-          wrapText(ctx, judul, 810, 420, 460, 110, 'left');
+          ctx.font = '12px "Space Mono", monospace';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'top';
+          ctx.fillText(tagline, 594, 40);
 
-          // tagline - CSS: top: 40px, left: 55%
+          // headline - top: 400px, left: 55%, 96px
           ctx.fillStyle = color;
-          ctx.font = '12px Space Mono';
-          ctx.textAlign = 'left';
-          ctx.fillText(tagline, 594, 55);
+          ctx.font = 'bold 96px "Playfair Display", serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, judul, 594, 400, 446, 96 * 0.9, 'left', true);
 
-          // sub-headline - CSS: top: 700px, left: 55%
+          // sub-headline - top: 700px, left: 55%, 18px
           ctx.fillStyle = '#1f2937';
-          ctx.font = '700 18px DM Sans';
-          wrapText(ctx, judul, 810, 720, 460, 24, 'left');
+          ctx.font = 'bold 18px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, sub, 594, 700, 446, 22, 'left', true);
 
-          // info-bar - CSS: bottom: 300px, left: 55%
+          // info-bar - bottom: 300px = 1050px, left: 55%
           ctx.fillStyle = '#1f2937';
-          ctx.font = '11px Space Mono';
+          ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'left';
+          ctx.textBaseline = 'top';
           ctx.fillText(info, 594, 1050);
 
-          // two-col-text - CSS: top: 800px, left: 55%, single column
+          // two-col-text - top: 800px, left: 55%
           ctx.fillStyle = '#374151';
-          ctx.font = '300 13px DM Sans';
-          wrapText(ctx, desc1, 810, 820, 460, 20, 'left');
-          wrapText(ctx, desc2, 810, 860, 460, 20, 'left');
+          ctx.font = '300 13px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, desc1, 594, 800, 446, 20, 'left', true);
+          drawWrappedText(ctx, desc2, 594, 860, 446, 20, 'left', true);
+
+          // brand - bottom: 40px, right: 40px
+          // (logo handled separately)
+
         } else if (currentLayout === 5) {
-          // LAYOUT 5 - Centered with image
-          // headline - CSS: top: 590px
+          // LAYOUT 5 - Centered image & text
+          // image: centered at top: 50px
+
+          // tagline - top: 20px, centered, 11px
           ctx.fillStyle = color;
-          ctx.font = '900 110px Playfair Display';
-          wrapText(ctx, judul, 540, 610, 900, 130, 'center');
+          ctx.font = '11px "Space Mono", monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(tagline, 540, 20);
 
-          // tagline - CSS: top: 20px
+          // info-bar - top: 550px, centered
+          ctx.fillStyle = '#1f2937';
+          ctx.font = '11px "Space Mono", monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(info, 540, 550);
+
+          // headline - top: 590px, centered, 110px
           ctx.fillStyle = color;
-          ctx.font = '11px Space Mono';
-          ctx.textAlign = 'center';
-          ctx.fillText(tagline, 540, 30);
+          ctx.font = 'bold 110px "Playfair Display", serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, judul, 540, 590, 900, 110 * 0.95, 'center', true);
 
-          // sub-headline - CSS: top: 827px
+          // sub-headline - top: 827px, centered, 19px
           ctx.fillStyle = '#1f2937';
-          ctx.font = '700 19px DM Sans';
-          wrapText(ctx, sub, 540, 840, 900, 26, 'center');
+          ctx.font = 'bold 19px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, sub, 540, 827, 900, 23, 'center', true);
 
-          // info-bar - CSS: top: 550px
-          ctx.fillStyle = '#1f2937';
-          ctx.font = '11px Space Mono';
-          ctx.textAlign = 'center';
-          ctx.fillText(info, 540, 560);
-
-          // two-col-text - CSS: top: 888px, centered
+          // two-col-text - top: 888px, centered
           ctx.fillStyle = '#4b5563';
-          ctx.font = '300 20px DM Sans';
-          wrapText(ctx, desc1, 540, 910, 600, 28, 'center');
-          wrapText(ctx, desc2, 540, 980, 600, 28, 'center');
+          ctx.font = '300 20px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, desc1, 540, 888, 600, 26, 'center', true);
+          drawWrappedText(ctx, desc2, 540, 950, 600, 26, 'center', true);
+
+          // brand - bottom: 40px, right: 40px
+
         } else if (currentLayout === 6) {
-          // LAYOUT 6 - Center overlay with side images
-          // headline - CSS: top: 440px, left: 50%, width: 600px
+          // LAYOUT 6 - Center overlay
+          // tagline - top: 80px, centered, 12px
           ctx.fillStyle = color;
-          ctx.font = '500 140px Playfair Display';
-          wrapText(ctx, judul, 540, 460, 600, 150, 'center');
+          ctx.font = '12px "Space Mono", monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(tagline, 540, 80);
 
-          // tagline - CSS: top: 80px
+          // sub-headline - top: 400px, centered, 20px
+          ctx.fillStyle = '#1f2937';
+          ctx.font = 'bold 20px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, sub, 540, 400, 600, 24, 'center', true);
+
+          // headline - top: 440px, centered, 140px (font-weight: 500)
           ctx.fillStyle = color;
-          ctx.font = '12px Space Mono';
-          ctx.textAlign = 'center';
-          ctx.fillText(tagline, 540, 95);
+          ctx.font = '500 140px "Playfair Display", serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, judul, 540, 440, 600, 140 * 0.95, 'center', true);
 
-          // sub-headline - CSS: top: 400px
+          // info-bar - top: 880px, centered
           ctx.fillStyle = '#1f2937';
-          ctx.font = '700 20px DM Sans';
-          wrapText(ctx, sub, 540, 415, 600, 28, 'center');
-
-          // info-bar - CSS: top: 880px
-          ctx.fillStyle = '#1f2937';
-          ctx.font = '11px Space Mono';
+          ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(info, 540, 890);
+          ctx.textBaseline = 'top';
+          ctx.fillText(info, 540, 880);
 
-          // two-col-text - CSS: top: 950px
+          // two-col-text - top: 950px, centered
           ctx.fillStyle = '#374151';
-          ctx.font = '300 14px DM Sans';
-          wrapText(ctx, desc1, 540, 960, 600, 20, 'center');
-          wrapText(ctx, desc2, 540, 990, 600, 20, 'center');
+          ctx.font = '300 14px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, desc1, 540, 950, 600, 20, 'center', true);
+          drawWrappedText(ctx, desc2, 540, 980, 600, 20, 'center', true);
+
+          // brand - bottom: 40px, right: 40px
+
         } else if (currentLayout === 7) {
-          // LAYOUT 7 - Circular images with side text
-          // headline - CSS: top: 80px, left: 40px, right: 220px, font-size: 160px
+          // LAYOUT 7 - Side circles + centered text
+          // tagline - top: 60px, left: 40px, 13.2px
           ctx.fillStyle = color;
-          ctx.font = '500 160px Playfair Display';
-          wrapText(ctx, judul, 100, 140, 500, 160, 'left');
+          ctx.font = '13.2px "Space Mono", monospace';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'top';
+          ctx.fillText(tagline, 40, 60);
 
-          // tagline - CSS: top: 60px, left: 40px
+          // headline - top: 80px, left: 40px, 160px (font-weight: 500)
           ctx.fillStyle = color;
-          ctx.font = '13.2px Space Mono';
-          ctx.textAlign = 'left';
-          ctx.fillText(tagline, 40, 75);
+          ctx.font = '500 160px "Playfair Display", serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, judul, 40, 80, 500, 160, 'left', true);
 
-          // sub-headline - CSS: top: 645px, left: 40px, width: 500px
+          // sub-headline - top: 645px, left: 40px, 28px
           ctx.fillStyle = '#1f2937';
-          ctx.font = '700 28px DM Sans';
-          wrapText(ctx, sub, 100, 660, 500, 36, 'left');
+          ctx.font = 'bold 28px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, sub, 40, 645, 500, 32, 'left', true);
 
-          // info-bar - CSS: bottom: 50px, left: 40px
+          // info-bar - bottom: 50px = 1300px, left: 40px
           ctx.fillStyle = '#1f2937';
-          ctx.font = '11px Space Mono';
+          ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'left';
-          ctx.fillText(info, 40, 1300);
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(info, 40, 1350);
 
-          // two-col-text - CSS: bottom: 120px, right: 40px, width: 420px
+          // two-col-text - bottom: 120px = 1230px, right: 40px
           ctx.fillStyle = '#374151';
-          ctx.font = '300 22.1px DM Sans';
-          wrapText(ctx, desc1, 950, 1100, 420, 30, 'right');
-          wrapText(ctx, desc2, 950, 1160, 420, 30, 'right');
+          ctx.font = '300 22.1px "DM Sans", sans-serif';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, desc1, 920, 1100, 420, 28, 'right', true);
+          drawWrappedText(ctx, desc2, 920, 1150, 420, 28, 'right', true);
+
+          // brand - bottom: 40px, right: 40px
+
         } else if (currentLayout === 8) {
-          // LAYOUT 8 - Right image, left text
-          // tagline - CSS: top: 60px, left: 40px, font-size: 33px
+          // LAYOUT 8 - Right image, left text stacked
+          // tagline - top: 60px, left: 40px, 33px
           ctx.fillStyle = color;
-          ctx.font = '33px Helvetica Neue';
+          ctx.font = '33px "Helvetica Neue", Helvetica, Arial, sans-serif';
           ctx.textAlign = 'left';
-          ctx.fillText(tagline, 40, 90);
+          ctx.textBaseline = 'top';
+          ctx.fillText(tagline, 40, 60);
 
-          // headline - CSS: top: 567.5px, left: 100px, font-size: 149.5px
+          // headline - top: 567.5px, left: 100px, 149.5px (font-weight: 700)
           ctx.fillStyle = color;
-          ctx.font = '700 149.5px Helvetica Neue';
-          wrapText(ctx, judul, 100, 620, 780, 160, 'left');
+          ctx.font = 'bold 149.5px "Helvetica Neue", Helvetica, Arial, sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, judul, 100, 567.5, 780, 149.5 * 0.95, 'left', true);
 
-          // sub-headline - CSS: top: 1029px, left: 100px, font-size: 26px
+          // sub-headline - top: 1029px, left: 100px, 26px (font-weight: 500)
           ctx.fillStyle = '#1f2937';
-          ctx.font = '500 26px Helvetica Neue';
-          wrapText(ctx, sub, 100, 1040, 600, 32, 'left');
-
-          // info-bar - CSS: top: 1180px, left: 100px, font-size: 21px
-          ctx.fillStyle = '#1f2937';
-          ctx.font = '500 21px Helvetica Neue';
+          ctx.font = '500 26px "Helvetica Neue", Helvetica, Arial, sans-serif';
           ctx.textAlign = 'left';
-          ctx.fillText(info, 100, 1190);
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, sub, 100, 1029, 600, 31, 'left', true);
 
-          // two-col-text - CSS: bottom: 310px, right: 40px, width: 200px
+          // info-bar - top: 1180px, left: 100px, 21px (font-weight: 500)
+          ctx.fillStyle = '#1f2937';
+          ctx.font = '500 21px "Helvetica Neue", Helvetica, Arial, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'top';
+          ctx.fillText(info, 100, 1180);
+
+          // two-col-text - bottom: 310px = 1040px, right: 40px
           ctx.fillStyle = '#374151';
-          ctx.font = '300 13px DM Sans';
-          wrapText(ctx, desc1, 920, 1060, 200, 18, 'right');
-          wrapText(ctx, desc2, 920, 1100, 200, 18, 'right');
+          ctx.font = '300 13px "DM Sans", sans-serif';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, desc1, 920, 1040, 200, 18, 'right', true);
+          drawWrappedText(ctx, desc2, 920, 1080, 200, 18, 'right', true);
+
+          // brand - bottom: 40px, left: 40px
+
         } else if (currentLayout === 9) {
           // LAYOUT 9 - Image bottom, text top
-          // headline - CSS: top: 167.5px
+          // tagline - top: 40px, left: 40px, 11px
           ctx.fillStyle = color;
-          ctx.font = '500 99.2px Playfair Display';
-          wrapText(ctx, judul, 540, 200, 900, 115, 'center');
-
-          // tagline - CSS: top: 40px, left: 40px
-          ctx.fillStyle = color;
-          ctx.font = '11px Space Mono';
+          ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'left';
-          ctx.fillText(tagline, 40, 55);
+          ctx.textBaseline = 'top';
+          ctx.fillText(tagline, 40, 40);
 
-          // sub-headline - CSS: top: 386px
+          // info-bar - top: 145px, centered
           ctx.fillStyle = '#1f2937';
-          ctx.font = '700 19px DM Sans';
-          wrapText(ctx, sub, 540, 400, 900, 26, 'center');
-
-          // info-bar - CSS: top: 145px
-          ctx.fillStyle = '#1f2937';
-          ctx.font = '11px Space Mono';
+          ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(info, 540, 155);
+          ctx.textBaseline = 'top';
+          ctx.fillText(info, 540, 145);
 
-          // two-col-text - CSS: top: 470px
+          // headline - top: 167.5px, centered, 99.2px (font-weight: 500)
+          ctx.fillStyle = color;
+          ctx.font = '500 99.2px "Playfair Display", serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, judul, 540, 167.5, 900, 99.2 * 1.1, 'center', true);
+
+          // sub-headline - top: 386px, centered, 19px
+          ctx.fillStyle = '#1f2937';
+          ctx.font = 'bold 19px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, sub, 540, 386, 900, 23, 'center', true);
+
+          // two-col-text - top: 470px, centered
           ctx.fillStyle = '#374151';
-          ctx.font = '300 14px DM Sans';
-          wrapText(ctx, desc1, 540, 480, 600, 20, 'center');
-          wrapText(ctx, desc2, 540, 510, 600, 20, 'center');
+          ctx.font = '300 14px "DM Sans", sans-serif';
+          ctx.textBaseline = 'top';
+          drawWrappedText(ctx, desc1, 540, 470, 600, 20, 'center', true);
+          drawWrappedText(ctx, desc2, 540, 500, 600, 20, 'center', true);
+
+          // brand - top: 50px, right: 40px
         }
 
         // Download
@@ -1605,5 +1747,5 @@
     // Init icons
     lucide.createIcons();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9a317515d4403b',t:'MTc3NTc0NDg1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9a4aa8b73df8fb',t:'MTc3NTc0NTg4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
