@@ -911,6 +911,19 @@
     }
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
     input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 6px; }
+  body {
+  overflow-x: hidden;
+}
+
+#posterWrapper {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.poster-wrapper {
+  display: flex;
+  justify-content: center;
+}
   </style>
   <style>body { box-sizing: border-box; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
@@ -992,7 +1005,7 @@
     </div>
 
     <!-- 🔥 PREVIEW (SUDAH PINDAH KE DALAM) -->
-    <div class="py-10 flex justify-center overflow-visible">
+    <div class="py-10 flex justify-center overflow-hidden">
       <div class="poster-wrapper" id="posterWrapper">
         <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
 
@@ -1325,9 +1338,12 @@
   wrapper.style.transform = `scale(${scale})`;
   wrapper.style.transformOrigin = 'top center';
 
-  // 🔥 biarin size asli (JANGAN ikut scale)
+  // 🔥 penting
   wrapper.style.width = '1080px';
-  wrapper.style.height = `${1350 * scale}px`;
+  wrapper.style.height = 'auto';
+
+  // 🔥 ini kunci biar gak kepotong
+  container.style.height = `${1350 * scale}px`;
 }
 
     window.addEventListener('resize', scalePoster);
