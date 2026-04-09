@@ -961,9 +961,6 @@
       <p class="text-[10px] text-neutral-400 font-mono">1 / 9</p>
      </div><button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></button>
     </div>
-   </div><!-- Export Button -->
-   <div class="px-6 py-4 border-b border-neutral-200 flex justify-center">
-    <button id="downloadPngBtn" class="px-6 py-2 rounded-lg bg-neutral-900 text-white font-mono text-xs hover:bg-neutral-800 transition-colors flex items-center gap-2"> <i data-lucide="download" style="width:14px;height:14px;"></i> Export as PNG </button>
    </div><!-- Live Preview -->
    <div class="py-10 flex justify-center">
     <div class="poster-wrapper" id="posterWrapper">
@@ -1288,6 +1285,29 @@
       ctx.restore();
     }
 
+    function drawImageCover(ctx, img, x, y, w, h) {
+      if (!img) return;
+
+      const imgRatio = img.width / img.height;
+      const boxRatio = w / h;
+
+      let drawWidth, drawHeight, offsetX, offsetY;
+
+      if (imgRatio > boxRatio) {
+        drawHeight = h;
+        drawWidth = img.width * (h / img.height);
+        offsetX = (w - drawWidth) / 2;
+        offsetY = 0;
+      } else {
+        drawWidth = w;
+        drawHeight = img.height * (w / img.width);
+        offsetX = 0;
+        offsetY = (h - drawHeight) / 2;
+      }
+
+      ctx.drawImage(img, x + offsetX, y + offsetY, drawWidth, drawHeight);
+    }
+
     function drawImageWithFadeMask(ctx, img, x, y, w, h, maskDir = 'bottom') {
       if (!img) return;
       
@@ -1318,16 +1338,16 @@
       ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
       
       // Headline
-      ctx.font = 'bold 140px Playfair Display';
+      ctx.font = "bold 140px 'Playfair Display', serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 50, 1000, 130, 'center');
+      wrapText(ctx, data.headline, CANVAS_W / 2, 50, 1000, 140 * 0.92, 'center');
       
       // Sub Headline
-      ctx.font = 'bold 26px DM Sans';
+      ctx.font = "bold 26px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 380, 1000, 32, 'center');
+      wrapText(ctx, data.sub, CANVAS_W / 2, 380, 1000, 26 * 0.92, 'center');
       
       // Hero Image with fade
       if (data.heroImg) {
@@ -1335,24 +1355,43 @@
       }
       
       // Tagline
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
       ctx.fillText(data.tagline, 40, 1300);
       
       // Info
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
       ctx.fillText(data.info, CANVAS_W / 2, 1125);
       
-      // Description (two columns)
-      ctx.font = '16px DM Sans';
+      // Info bar lines
+      ctx.strokeStyle = '#e5e7eb';
+      ctx.lineWidth = 1;
+      
+      ctx.beginPath();
+      ctx.moveTo(40, 1125);
+      ctx.lineTo(300, 1125);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(780, 1125);
+      ctx.lineTo(1040, 1125);
+      ctx.stroke();
+      
+      // Description (two columns with wrapping)
+      ctx.font = "300 16px 'DM Sans', sans-serif";
       ctx.fillStyle = '#374151';
       ctx.textAlign = 'left';
-      ctx.fillText(data.desc1, 40, 1175);
+      wrapText(ctx, data.desc1, 40, 1175, 480, 22, 'left');
       ctx.textAlign = 'right';
-      ctx.fillText(data.desc2, CANVAS_W - 40, 1175);
+      wrapText(ctx, data.desc2, 1040, 1175, 480, 22, 'right');
+      
+      // Logo
+      if (data.logo) {
+        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
+      }
     }
 
     async function drawLayout2(ctx, data) {
@@ -1361,39 +1400,44 @@
       
       // Hero Image (Right side)
       if (data.heroImg) {
-        drawImage(ctx, data.heroImg, 540, 40, 500, 1270);
+        drawImageCover(ctx, data.heroImg, 540, 40, 500, 1270);
       }
       
       // Headline (Left side)
-      ctx.font = 'bold 88px Playfair Display';
+      ctx.font = "bold 88px 'Playfair Display', serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
-      wrapText(ctx, data.headline, 40, 760, 500, 100, 'left');
+      wrapText(ctx, data.headline, 40, 760, 500, 88 * 0.92, 'left');
       
       // Sub Headline
-      ctx.font = 'bold 20px DM Sans';
+      ctx.font = "bold 20px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'left';
-      wrapText(ctx, data.sub, 40, 960, 480, 28, 'left');
+      wrapText(ctx, data.sub, 40, 960, 480, 20 * 0.92, 'left');
       
       // Description stacked
-      ctx.font = '14px DM Sans';
+      ctx.font = "300 14px 'DM Sans', sans-serif";
       ctx.fillStyle = '#374151';
       ctx.textAlign = 'left';
       wrapText(ctx, data.desc1, 40, 1030, 480, 20, 'left');
       wrapText(ctx, data.desc2, 40, 1090, 480, 20, 'left');
       
       // Tagline
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
       ctx.fillText(data.tagline, 40, 70);
       
       // Info (bottom right)
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'right';
       ctx.fillText(data.info, CANVAS_W - 40, 1300);
+      
+      // Logo
+      if (data.logo) {
+        drawImageCover(ctx, data.logo, 40, 1250, 60, 60);
+      }
     }
 
     async function drawLayout3(ctx, data) {
@@ -1402,32 +1446,37 @@
       
       // Hero Image (top full width)
       if (data.heroImg) {
-        drawImage(ctx, data.heroImg, 40, 20, 1000, 600);
+        drawImageCover(ctx, data.heroImg, 40, 20, 1000, 600);
       }
       
       // Info
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
       ctx.fillText(data.info, CANVAS_W / 2, 650);
       
       // Headline
-      ctx.font = 'bold 120px Playfair Display';
+      ctx.font = "bold 120px 'Playfair Display', serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 700, 1000, 120, 'center');
+      wrapText(ctx, data.headline, CANVAS_W / 2, 700, 1000, 120 * 0.92, 'center');
       
       // Sub
-      ctx.font = 'bold 20px DM Sans';
+      ctx.font = "bold 20px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 970, 1000, 28, 'center');
+      wrapText(ctx, data.sub, CANVAS_W / 2, 970, 1000, 20 * 0.92, 'center');
       
       // Tagline
-      ctx.font = '11px Space Mono';
+      ctx.font = "11px 'Space Mono', monospace";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
       ctx.fillText(data.tagline, 40, 1300);
+      
+      // Logo
+      if (data.logo) {
+        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
+      }
     }
 
     async function drawLayout4(ctx, data) {
@@ -1436,32 +1485,37 @@
       
       // Hero Image (left)
       if (data.heroImg) {
-        drawImage(ctx, data.heroImg, 40, 40, 450, 800, 20);
+        drawImageCover(ctx, data.heroImg, 40, 40, 450, 800);
       }
       
       // Headline
-      ctx.font = 'bold 96px Playfair Display';
+      ctx.font = "bold 96px 'Playfair Display', serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
-      wrapText(ctx, data.headline, 595, 400, 445, 110, 'left');
+      wrapText(ctx, data.headline, 595, 400, 445, 96 * 0.92, 'left');
       
       // Sub
-      ctx.font = 'bold 18px DM Sans';
+      ctx.font = "bold 18px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'left';
-      wrapText(ctx, data.sub, 595, 700, 445, 26, 'left');
+      wrapText(ctx, data.sub, 595, 700, 445, 18 * 0.92, 'left');
       
       // Tagline
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
       ctx.fillText(data.tagline, 595, 70);
       
       // Description
-      ctx.font = '13px DM Sans';
+      ctx.font = "300 13px 'DM Sans', sans-serif";
       ctx.fillStyle = '#374151';
       ctx.textAlign = 'left';
       wrapText(ctx, data.desc1, 595, 800, 445, 18, 'left');
+      
+      // Logo
+      if (data.logo) {
+        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
+      }
     }
 
     async function drawLayout5(ctx, data) {
@@ -1470,38 +1524,43 @@
       
       // Hero Image (centered)
       if (data.heroImg) {
-        drawImage(ctx, data.heroImg, 240, 50, 600, 500, 24);
+        drawImageCover(ctx, data.heroImg, 240, 50, 600, 500);
       }
       
       // Tagline
-      ctx.font = '11px Space Mono';
+      ctx.font = "11px 'Space Mono', monospace";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'center';
       ctx.fillText(data.tagline, CANVAS_W / 2, 30);
       
       // Info
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
       ctx.fillText(data.info, CANVAS_W / 2, 550);
       
       // Headline
-      ctx.font = 'bold 110px Playfair Display';
+      ctx.font = "bold 110px 'Playfair Display', serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 590, 1000, 110, 'center');
+      wrapText(ctx, data.headline, CANVAS_W / 2, 590, 1000, 110 * 0.92, 'center');
       
       // Sub
-      ctx.font = 'bold 19px DM Sans';
+      ctx.font = "bold 19px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 827, 1000, 28, 'center');
+      wrapText(ctx, data.sub, CANVAS_W / 2, 827, 1000, 19 * 0.92, 'center');
       
       // Description
-      ctx.font = '20px DM Sans';
+      ctx.font = "300 20px 'DM Sans', sans-serif";
       ctx.fillStyle = '#4b5563';
       ctx.textAlign = 'center';
       wrapText(ctx, data.desc1, CANVAS_W / 2, 888, 600, 28, 'center');
+      
+      // Logo
+      if (data.logo) {
+        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
+      }
     }
 
     async function drawLayout6(ctx, data) {
@@ -1545,34 +1604,39 @@
       }
       
       // Tagline
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'center';
       ctx.fillText(data.tagline, CANVAS_W / 2, 80);
       
       // Sub
-      ctx.font = 'bold 20px DM Sans';
+      ctx.font = "bold 20px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 400, 600, 28, 'center');
+      wrapText(ctx, data.sub, CANVAS_W / 2, 400, 600, 20 * 0.92, 'center');
       
       // Headline
-      ctx.font = 'bold 140px Playfair Display';
+      ctx.font = "bold 140px 'Playfair Display', serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 440, 600, 130, 'center');
+      wrapText(ctx, data.headline, CANVAS_W / 2, 440, 600, 140 * 0.92, 'center');
       
       // Info
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
       ctx.fillText(data.info, CANVAS_W / 2, 880);
       
       // Description
-      ctx.font = '14px DM Sans';
+      ctx.font = "300 14px 'DM Sans', sans-serif";
       ctx.fillStyle = '#374151';
       ctx.textAlign = 'center';
       wrapText(ctx, data.desc1, CANVAS_W / 2, 950, 600, 20, 'center');
+      
+      // Logo
+      if (data.logo) {
+        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
+      }
     }
 
     async function drawLayout7(ctx, data) {
@@ -1599,7 +1663,7 @@
       }
       
       // Tagline
-      ctx.font = '13px Space Mono';
+      ctx.font = "13px 'Space Mono', monospace";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
       ctx.fillText(data.tagline, 40, 60);
@@ -1613,28 +1677,33 @@
       ctx.stroke();
       
       // Headline
-      ctx.font = 'bold 160px Playfair Display';
+      ctx.font = "bold 160px 'Playfair Display', serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
-      wrapText(ctx, data.headline, 40, 80, 500, 155, 'left');
+      wrapText(ctx, data.headline, 40, 80, 500, 160 * 0.92, 'left');
       
       // Sub
-      ctx.font = 'bold 28px DM Sans';
+      ctx.font = "bold 28px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'left';
-      wrapText(ctx, data.sub, 40, 645, 500, 34, 'left');
+      wrapText(ctx, data.sub, 40, 645, 500, 28 * 0.92, 'left');
       
       // Info
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'left';
       ctx.fillText(data.info, 40, 1300);
       
       // Description (right side)
-      ctx.font = '22px DM Sans';
+      ctx.font = "300 22px 'DM Sans', sans-serif";
       ctx.fillStyle = '#4b5563';
       ctx.textAlign = 'right';
       wrapText(ctx, data.desc1, CANVAS_W - 40, 120, 420, 28, 'right');
+      
+      // Logo
+      if (data.logo) {
+        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
+      }
     }
 
     async function drawLayout8(ctx, data) {
@@ -1643,35 +1712,35 @@
       
       // Hero Image
       if (data.heroImg) {
-        drawImage(ctx, data.heroImg, 340, 150, 744, 432);
+        drawImageCover(ctx, data.heroImg, 340, 150, 744, 432);
       }
       
       // Tagline
-      ctx.font = '33px DM Sans';
+      ctx.font = "33px 'DM Sans', sans-serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
       ctx.fillText(data.tagline, 40, 100);
       
       // Headline
-      ctx.font = 'bold 149px Playfair Display';
+      ctx.font = "bold 149px 'Playfair Display', serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
-      wrapText(ctx, data.headline, 100, 567, 780, 140, 'left');
+      wrapText(ctx, data.headline, 100, 567, 780, 149 * 0.92, 'left');
       
       // Sub
-      ctx.font = '26px DM Sans';
+      ctx.font = "500 26px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'left';
       wrapText(ctx, data.sub, 100, 1029, 600, 32, 'left');
       
       // Info
-      ctx.font = '21px DM Sans';
+      ctx.font = "500 21px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'left';
       ctx.fillText(data.info, 100, 1180);
       
       // Description
-      ctx.font = '13px DM Sans';
+      ctx.font = "300 13px 'DM Sans', sans-serif";
       ctx.fillStyle = '#374151';
       ctx.textAlign = 'right';
       wrapText(ctx, data.desc1, CANVAS_W - 40, CANVAS_H - 200, 200, 18, 'right');
@@ -1679,6 +1748,11 @@
       // Anchor line (bottom color)
       ctx.fillStyle = data.color;
       ctx.fillRect(100, 1230, 680, 10);
+      
+      // Logo
+      if (data.logo) {
+        drawImageCover(ctx, data.logo, 40, 1250, 60, 60);
+      }
     }
 
     async function drawLayout9(ctx, data) {
@@ -1686,31 +1760,31 @@
       ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
       
       // Tagline
-      ctx.font = '11px Space Mono';
+      ctx.font = "11px 'Space Mono', monospace";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'left';
       ctx.fillText(data.tagline, 40, 50);
       
       // Info
-      ctx.font = '12px Space Mono';
+      ctx.font = "12px 'Space Mono', monospace";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
       ctx.fillText(data.info, CANVAS_W / 2, 145);
       
       // Headline
-      ctx.font = 'bold 99px Playfair Display';
+      ctx.font = "bold 99px 'Playfair Display', serif";
       ctx.fillStyle = data.color;
       ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 167, 500, 110, 'center');
+      wrapText(ctx, data.headline, CANVAS_W / 2, 167, 500, 99 * 0.92, 'center');
       
       // Sub
-      ctx.font = 'bold 19px DM Sans';
+      ctx.font = "bold 19px 'DM Sans', sans-serif";
       ctx.fillStyle = '#1f2937';
       ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 386, 1000, 28, 'center');
+      wrapText(ctx, data.sub, CANVAS_W / 2, 386, 1000, 19 * 0.92, 'center');
       
       // Description
-      ctx.font = '14px DM Sans';
+      ctx.font = "300 14px 'DM Sans', sans-serif";
       ctx.fillStyle = '#374151';
       ctx.textAlign = 'center';
       wrapText(ctx, data.desc1, CANVAS_W / 2, 470, 600, 18, 'center');
@@ -1718,6 +1792,11 @@
       // Hero Image (bottom with fade)
       if (data.heroImg) {
         drawImageWithFadeMask(ctx, data.heroImg, 0, CANVAS_H - 900, CANVAS_W, 900, 'top');
+      }
+      
+      // Logo
+      if (data.logo) {
+        drawImageCover(ctx, data.logo, 980, 50, 60, 60);
       }
     }
 
@@ -1758,6 +1837,11 @@
         data.sideImgRight = await loadImagePromise(sideRight.src);
       }
       
+      const logoEl = document.querySelector('#p_brand img');
+      if (logoEl && logoEl.src) {
+        data.logo = await loadImagePromise(logoEl.src);
+      }
+      
       // Draw layout
       const layoutFunctions = [
         drawLayout1, drawLayout2, drawLayout3, drawLayout4, drawLayout5,
@@ -1771,30 +1855,11 @@
       return canvas;
     }
 
-    // Download handler
-    document.getElementById('downloadPngBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('downloadPngBtn');
-      btn.disabled = true;
-      btn.textContent = 'Exporting...';
-      
-      try {
-        const canvas = await exportAsCanvas();
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = `layout-${currentLayout}-${Date.now()}.png`;
-        link.click();
-      } catch (e) {
-        console.error('Export error:', e);
-        alert('Export failed: ' + e.message);
-      }
-      
-      btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Export as PNG';
-      lucide.createIcons();
-    });
+    // Download handler removed
+
 
     // Init icons
     lucide.createIcons();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9b2d90360f9e35',t:'MTc3NTc1NTE3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9b5618301e8936',t:'MTc3NTc1Njg0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
