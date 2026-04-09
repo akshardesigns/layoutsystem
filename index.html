@@ -7,9 +7,6 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&amp;family=DM+Sans:wght@300;400;500;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -953,7 +950,7 @@
       <p id="layoutIndicator" class="text-[12px] font-semibold text-neutral-900">Layout 1</p>
       <p class="text-[10px] text-neutral-400 font-mono">1 / 9</p>
      </div><button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></button>
-    </div><button id="downloadPdfBtn" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-2"><i data-lucide="download" style="width:14px;height:14px;"></i> Download PDF</button>
+    </div><button id="downloadPdfBtn" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-2"><i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG</button>
    </div><!-- Live Preview -->
    <div class="py-10 flex justify-center">
     <div class="poster-wrapper" id="posterWrapper">
@@ -1092,121 +1089,163 @@
       if (currentLayout > 1) updateLayout(currentLayout - 1);
     });
 
+    // Text wrapping utility
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, align = 'left') {
+      const words = text.split(' ');
+      let line = '';
+      ctx.textAlign = align;
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line, x, y);
+          line = words[n] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+
+      ctx.fillText(line, x, y);
+    }
+
     // Download PNG
-document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
-  const btn = document.getElementById('downloadPdfBtn');
-  const posterCanvas = document.getElementById('posterCanvas');
-
-  btn.disabled = true;
-  btn.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px;"></i> Processing...';
-  lucide.createIcons();
-
-  try {
-
-    // 🔥 temp container (offscreen)
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'fixed';
-    tempContainer.style.left = '-10000px';
-    tempContainer.style.top = '0';
-    tempContainer.style.width = '1080px';
-    tempContainer.style.background = '#ffffff';
-
-    // 🔥 clone canvas
-    const clonedCanvas = posterCanvas.cloneNode(true);
-
-    // ===== FIX START =====
-
-    // reset transform biar gak ke-distort
-    clonedCanvas.style.transform = 'none';
-    clonedCanvas.style.margin = '0';
-    clonedCanvas.style.padding = '0';
-
-    // paksa background putih
-    clonedCanvas.style.background = '#ffffff';
-
-    // fix image biar gak stretch
-    clonedCanvas.querySelectorAll('img').forEach(img => {
-      img.style.objectFit = 'cover';
-      img.style.width = '100%';
-      img.style.height = '100%';
-    });
-
-    // 🔥 replace mask-image (gradient) → overlay
-    clonedCanvas.querySelectorAll('.hero-image-area').forEach(el => {
-      const overlay = document.createElement('div');
-      overlay.style.position = 'absolute';
-      overlay.style.inset = '0';
-      overlay.style.background = 'linear-gradient(to bottom, transparent 0%, transparent 70%, #ffffff 100%)';
-      overlay.style.pointerEvents = 'none';
-      overlay.style.zIndex = '10';
-      el.appendChild(overlay);
-    });
-
-    // ===== FIX END =====
-
-    tempContainer.appendChild(clonedCanvas);
-    document.body.appendChild(tempContainer);
-
-    // tunggu font
-    await document.fonts.ready;
-
-    // tunggu semua gambar
-    const images = clonedCanvas.querySelectorAll('img');
-    await Promise.all([...images].map(img => {
-      if (img.complete) return Promise.resolve();
-      return new Promise(resolve => {
-        img.onload = img.onerror = resolve;
-      });
-    }));
-
-    // delay biar render stabil
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    // 🔥 capture
-    const canvas = await html2canvas(clonedCanvas, {
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      scale: 2,
-      width: 1080,
-      height: 1350,
-      windowWidth: 1080,
-      windowHeight: 1350,
-      scrollX: 0,
-      scrollY: 0
-    });
-
-    // cleanup
-    document.body.removeChild(tempContainer);
-
-    // download
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `poster-layout-${currentLayout}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG';
+    document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('downloadPdfBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px;"></i> Processing...';
       lucide.createIcons();
-    }, 'image/png', 1.0);
+      
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1080;
+        canvas.height = 1350;
+        const ctx = canvas.getContext('2d');
 
-  } catch (error) {
-    console.error('Download error:', error);
+        // Background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 1080, 1350);
 
-    btn.disabled = false;
-    btn.innerHTML = '<i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Error';
-    lucide.createIcons();
+        // Get image from poster
+        const imgSrc = document.querySelector('#p_hero img')?.src;
+        if (imgSrc) {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = imgSrc;
 
-    setTimeout(() => {
-      btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG';
-      lucide.createIcons();
-    }, 2000);
-  }
-});
+          await new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+
+          // Position based on current layout
+          let x, y, w, h;
+          if (currentLayout === 2) {
+            x = 540; y = 40; w = 480; h = 1270;
+          } else if (currentLayout === 3) {
+            x = 40; y = 20; w = 1000; h = 600;
+          } else if (currentLayout === 4) {
+            x = 40; y = 40; w = 486; h = 800;
+          } else if (currentLayout === 5) {
+            x = 240; y = 50; w = 600; h = 500;
+          } else {
+            // Default layout 1
+            x = 40; y = 490; w = 1000; h = 520;
+          }
+
+          // Cover crop
+          const imgRatio = img.width / img.height;
+          const boxRatio = w / h;
+          let drawWidth, drawHeight, offsetX, offsetY;
+
+          if (imgRatio > boxRatio) {
+            drawHeight = h;
+            drawWidth = h * imgRatio;
+            offsetX = -(drawWidth - w) / 2;
+            offsetY = 0;
+          } else {
+            drawWidth = w;
+            drawHeight = w / imgRatio;
+            offsetX = 0;
+            offsetY = -(drawHeight - h) / 2;
+          }
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(x, y, w, h);
+          ctx.clip();
+          ctx.drawImage(img, x + offsetX, y + offsetY, drawWidth, drawHeight);
+          ctx.restore();
+
+          // Gradient overlay (replaces mask-image)
+          const gradient = ctx.createLinearGradient(0, y, 0, y + h);
+          gradient.addColorStop(0, 'rgba(255,255,255,0)');
+          gradient.addColorStop(0.7, 'rgba(255,255,255,0)');
+          gradient.addColorStop(1, '#ffffff');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x, y, w, h);
+        }
+
+        // Get text content
+        const color = document.getElementById('inp_color').value;
+        const judul = document.getElementById('p_headline').textContent;
+        const sub = document.getElementById('p_sub').textContent;
+        const info = document.getElementById('p_info').textContent;
+        const tagline = document.getElementById('p_tagline').textContent;
+        const desc1 = document.getElementById('p_desc1').textContent;
+        const desc2 = document.getElementById('p_desc2').textContent;
+
+        // Draw headline
+        ctx.fillStyle = color;
+        ctx.font = 'bold 138px Playfair Display';
+        wrapText(ctx, judul, 540, 200, 900, 120, 'center');
+
+        // Draw tagline
+        ctx.fillStyle = color;
+        ctx.font = '13px Space Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText(tagline, 40, 1310);
+
+        // Draw sub headline
+        ctx.fillStyle = '#1f2937';
+        ctx.font = 'bold 28px DM Sans';
+        wrapText(ctx, sub, 540, 380, 800, 36, 'center');
+
+        // Draw info
+        ctx.fillStyle = '#1f2937';
+        ctx.font = '11px Space Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(info, 540, 1100);
+
+        // Draw descriptions (two column)
+        ctx.fillStyle = '#374151';
+        ctx.font = '300 17px DM Sans';
+        wrapText(ctx, desc1, 50, 1150, 450, 24, 'left');
+        wrapText(ctx, desc2, 1030, 1150, 450, 24, 'right');
+
+        // Download
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `poster-layout-${currentLayout}.png`;
+          link.click();
+          URL.revokeObjectURL(url);
+          
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG';
+          lucide.createIcons();
+        }, 'image/png');
+
+      } catch (error) {
+        console.error(error);
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG';
+        lucide.createIcons();
+      }
+    });
     
     // Touch swipe support on poster wrapper
     const posterWrapper = document.getElementById('posterWrapper');
@@ -1319,5 +1358,5 @@ document.getElementById('downloadPdfBtn').addEventListener('click', async () => 
     // Init icons
     lucide.createIcons();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e99c44fc62fb596',t:'MTc3NTc0MDM4My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9a1fb74303fd74',t:'MTc3NTc0NDEyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
