@@ -958,63 +958,96 @@
      </div>
     </div>
    </div><!-- Layout Selector -->
-   <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50">
-    <div class="flex items-center gap-3"><button id="prevBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-left" style="width:16px;height:16px;"></i></button>
-     <div class="text-center min-w-20">
-      <p id="layoutIndicator" class="text-[12px] font-semibold text-neutral-900">Layout 1</p>
-      <p class="text-[10px] text-neutral-400 font-mono">1 / 9</p>
-     </div><button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></button>
-    <button id="downloadBtn" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-2">
-  <i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG
-</button>
-   </div><!-- Live Preview -->
-   <div class="py-10 flex justify-center">
-    <div class="poster-wrapper" id="posterWrapper">
-     <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
-      <!-- Headline BG -->
-      <div class="headline-bg" id="p_headline" style="color:#C8553D;">
-       BEYOND THE EDGE
-      </div><!-- Hero Image -->
-      <div class="hero-image-area" id="p_hero">
-       <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);" id="p_hero_placeholder">
-        <div class="text-center text-neutral-300">
-         <i data-lucide="image" style="width:48px;height:48px;margin:0 auto;display:block"></i>
-         <p class="text-xs font-mono mt-3 tracking-wider uppercase">Upload Visual Hook</p>
-        </div>
-       </div>
-      </div><!-- Side Images for Layout 6 --> <img id="p_side_image_left" class="side-image-left" style="display:none;" alt="Side Image Left"> <img id="p_side_image_center" class="side-image-center" style="display:none;" alt="Center Image"> <img id="p_side_image_right" class="side-image-right" style="display:none;" alt="Side Image Right"> <!-- Sub Headline -->
-      <div class="sub-headline" id="p_sub" style="color:#1f2937;">
-       Exploring the invisible boundaries of modern creative culture
-      </div><!-- Tagline -->
-      <div class="tagline-area" id="p_tagline" style="color:#C8553D;">
-       FORM FOLLOWS FEELING
-      </div><!-- Info Bar -->
-      <div class="info-bar" id="p_info_bar">
-       <span style="color:#1f2937;" id="p_info">VOL. 03 — 2025 EDITION</span>
-       <div class="line" id="p_info_line" style="background:#e5e7eb;"></div>
-      </div><!-- Two Column Text -->
-      <div class="two-col-text">
-       <div class="col-text" id="p_desc1" style="color:#374151;">
-        A visual essay on the tension between minimalism and expression. We strip away the unnecessary to reveal what truly matters in design.
-       </div>
-       <div class="col-text" id="p_desc2" style="color:#374151;">
-        Through careful composition and deliberate restraint, each element finds its purpose. Nothing is accidental — every pixel is intentional.
-       </div>
-      </div><!-- Brand Area -->
-      <div class="brand-area" id="p_brand">
-       <div id="p_logo_placeholder" class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(255,255,255,0.08);">
-        <i data-lucide="hexagon" style="width:18px;height:18px;color:rgba(255,255,255,0.25)"></i>
-       </div>
-      </div><!-- Layout 7: Top right line -->
-      <div class="top-right-line"></div><!-- Layout 8: Bottom anchor line -->
-      <div class="layout-8-anchor-line" id="p_layout8_line"></div>
-     </div>
-     <div class="swipe-indicator right">
-      <i data-lucide="chevron-right"></i>
-     </div>
+
+<div class="px-6 py-4 border-b border-neutral-200 bg-neutral-50">
+
+  <!-- 🔥 TAMBAHAN WRAPPER (INI KUNCI FIX) -->
+  <div class="flex flex-col items-center gap-6 w-full">
+
+    <!-- TOP BAR -->
+    <div class="flex items-center gap-3">
+      <button id="prevBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors">
+        <i data-lucide="chevron-left" style="width:16px;height:16px;"></i>
+      </button>
+
+      <div class="text-center min-w-20">
+        <p id="layoutIndicator" class="text-[12px] font-semibold text-neutral-900">Layout 1</p>
+        <p class="text-[10px] text-neutral-400 font-mono">1 / 9</p>
+      </div>
+
+      <button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors">
+        <i data-lucide="chevron-right" style="width:16px;height:16px;"></i>
+      </button>
+
+      <button id="downloadBtn" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-2">
+        <i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG
+      </button>
     </div>
-   </div>
+
+    <!-- 🔥 PREVIEW (SUDAH PINDAH KE DALAM) -->
+    <div class="py-10 flex justify-center">
+      <div class="poster-wrapper" id="posterWrapper">
+        <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
+
+          <!-- Headline BG -->
+          <div class="headline-bg" id="p_headline" style="color:#C8553D;">
+            BEYOND THE EDGE
+          </div>
+
+          <!-- Hero Image -->
+          <div class="hero-image-area" id="p_hero">
+            <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);" id="p_hero_placeholder">
+              <div class="text-center text-neutral-300">
+                <i data-lucide="image" style="width:48px;height:48px;margin:0 auto;display:block"></i>
+                <p class="text-xs font-mono mt-3 tracking-wider uppercase">Upload Visual Hook</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Side Images -->
+          <img id="p_side_image_left" class="side-image-left" style="display:none;" alt="">
+          <img id="p_side_image_center" class="side-image-center" style="display:none;" alt="">
+          <img id="p_side_image_right" class="side-image-right" style="display:none;" alt="">
+
+          <!-- Sub -->
+          <div class="sub-headline" id="p_sub" style="color:#1f2937;">
+            Exploring the invisible boundaries of modern creative culture
+          </div>
+
+          <!-- Tagline -->
+          <div class="tagline-area" id="p_tagline" style="color:#C8553D;">
+            FORM FOLLOWS FEELING
+          </div>
+
+          <!-- Info -->
+          <div class="info-bar" id="p_info_bar">
+            <span id="p_info">VOL. 03 — 2025 EDITION</span>
+            <div class="line" id="p_info_line"></div>
+          </div>
+
+          <!-- Desc -->
+          <div class="two-col-text">
+            <div id="p_desc1">A visual essay...</div>
+            <div id="p_desc2">Through careful composition...</div>
+          </div>
+
+          <!-- Brand -->
+          <div class="brand-area" id="p_brand"></div>
+
+          <div class="top-right-line"></div>
+          <div class="layout-8-anchor-line" id="p_layout8_line"></div>
+
+        </div>
+      </div>
+
+      <!-- swipe indicator -->
+      <div class="swipe-indicator right">
+        <i data-lucide="chevron-right"></i>
+      </div>
+
+    </div>
   </div>
+</div>
   <script>
     // --- Element SDK (optional) ---
     if (window.elementSdk) {
