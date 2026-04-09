@@ -1331,16 +1331,16 @@
     });
 
     // --- Poster scaling ---
-  function scalePoster() {
+ function scalePoster() {
   const wrapper = document.getElementById('posterWrapper');
+  const container = wrapper.parentElement; // 🔥 ambil parent (field area)
 
-  const available = Math.min(window.innerWidth - 48, 900);
-  const scale = Math.min(available / 1080, 0.55);
+  const available = container.offsetWidth; // ✅ ini kuncinya
+  const scale = available / 1080;
 
   wrapper.style.transform = `scale(${scale})`;
   wrapper.style.transformOrigin = 'top center';
 
-  // ✅ ukuran asli (JANGAN IKUT SCALE)
   wrapper.style.width = '1080px';
   wrapper.style.height = '1350px';
 }
