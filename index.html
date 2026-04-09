@@ -1336,13 +1336,18 @@
     // --- Poster scaling ---
     function scalePoster() {  
   const wrapper = document.getElementById('posterWrapper');  
-  const container = wrapper.closest('.max-w-[900px]');
-
-  const availableWidth = container.clientWidth;
-  const scale = Math.min(availableWidth / 1080, 0.55);
-
+  const available = Math.min(window.innerWidth - 48, 900);  
+  const scale = Math.min(available / 1080, 0.55);  
+  
   wrapper.style.transform = `scale(${scale})`;
   wrapper.style.transformOrigin = 'top center';
+
+  wrapper.style.width = '1080px';
+  wrapper.style.height = '1350px'; // 🔥 BALIKIN NORMAL
+
+  // 🔥 FIX CENTER (biar kanan gak kepotong)
+  wrapper.style.margin = '0 auto';
+}
 
   // 🔥 INI KUNCINYA
   wrapper.style.width = '1080px';
