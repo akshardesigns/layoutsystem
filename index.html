@@ -24,14 +24,18 @@
     }
   </script>
   <style>
-   html, body {
-  overflow-x: hidden;
+   html, body { height: 100%; margin: 0; }  
+    .poster-canvas {  
+      width: 1080px;  
+      height: 1350px;  
+      position: relative;  
+      overflow: hidden; 
+   #posterWrapper {
+  margin: 0 auto;
 }
-.max-w-\[900px\] {
-  overflow: hidden;
-}
+
 .poster-wrapper {
-      transform-origin: top center;
+  overflow: visible !important;
 }
     .poster-canvas {
       width: 1080px;
@@ -983,7 +987,7 @@
 <div class="px-6 py-4 border-b border-neutral-200 bg-neutral-50">
 
   <!-- 🔥 TAMBAHAN WRAPPER (INI KUNCI FIX) -->
-  <div class="flex flex-col items-center gap-6 w-full max-w-[900px] mx-auto">
+  <div class="flex flex-col items-center gap-6 w-full">
 
     <!-- TOP BAR -->
     <div class="flex items-center gap-3">
@@ -1005,10 +1009,11 @@
       </button>
     </div>
 
-   <!-- 🔥 PREVIEW -->
-   <div class="py-10 flex justify-center">
-    <div class="poster-wrapper" id="posterWrapper">
-     <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
+    <!-- 🔥 PREVIEW (SUDAH PINDAH KE DALAM) -->
+    <div class="py-10 flex justify-center overflow">
+      <div class="poster-wrapper" id="posterWrapper">
+        <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
+
           <!-- Headline BG -->
           <div class="headline-bg" id="p_headline" style="color:#C8553D;">
             BEYOND THE EDGE
@@ -1326,30 +1331,15 @@
     });
 
     // --- Poster scaling ---
- function scalePoster() {
-  const wrapper = document.getElementById('posterWrapper');
-  const container = wrapper.parentElement;
-
-  // 🔥 ambil lebar REAL container
-  const availableWidth = container.offsetWidth;
-
-  // 🔥 hitung scale berdasarkan width
-  let scale = availableWidth / 1080;
-
-  // 🔥 kasih safety biar gak kepotong
-  scale = Math.min(scale, 0.55);
-
-  wrapper.style.transform = `scale(${scale})`;
-  wrapper.style.transformOrigin = 'top center';
-
-  wrapper.style.width = '1080px';
-  wrapper.style.height = '1350px';
-}
-
-  // 🔥 INI KUNCINYA
-  wrapper.style.width = '1080px';
-  wrapper.style.height = '1350px'; // ❌ JANGAN dikali scale
-}
+     function scalePoster() {  
+  const wrapper = document.getElementById('posterWrapper');  
+  const available = Math.min(window.innerWidth - 48, 900);  
+  const scale = Math.min(available / 1080, 0.55);  
+  
+  wrapper.style.transform = `scale(${scale})`;  
+  wrapper.style.width = '1080px';  
+  wrapper.style.height = `${1350 * scale}px`;  
+}  
 
     window.addEventListener('resize', scalePoster);
     scalePoster();
