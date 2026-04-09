@@ -1330,10 +1330,14 @@
   const wrapper = document.getElementById('posterWrapper');
   const container = wrapper.parentElement;
 
-  const available = container.offsetWidth;
+  // 🔥 ambil lebar REAL container
+  const availableWidth = container.offsetWidth;
 
-  // 🔥 tambahin limit biar gak kegedean
-  const scale = Math.min(available / 1080, 0.6);
+  // 🔥 hitung scale berdasarkan width
+  let scale = availableWidth / 1080;
+
+  // 🔥 kasih safety biar gak kepotong
+  scale = Math.min(scale, 0.55);
 
   wrapper.style.transform = `scale(${scale})`;
   wrapper.style.transformOrigin = 'top center';
