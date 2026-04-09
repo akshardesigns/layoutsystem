@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Layout System Generator</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&amp;family=DM+Sans:wght@300;400;500;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
@@ -1177,7 +1177,7 @@
       }
     }
 
-    // Download PNG using html2pdf
+    // Download PNG using html2canvas
     document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
       const btn = document.getElementById('downloadPdfBtn');
       btn.disabled = true;
@@ -1187,33 +1187,33 @@
       try {
         const posterCanvas = document.getElementById('posterCanvas');
         
-        // Clone the canvas to preserve original styling
-        const clonedCanvas = posterCanvas.cloneNode(true);
-        clonedCanvas.style.transform = 'scale(1)';
-        clonedCanvas.style.margin = '0';
+        // Get the current scale of the poster
+        const wrapper = document.getElementById('posterWrapper');
+        const computedStyle = window.getComputedStyle(wrapper);
+        const transform = computedStyle.transform;
+        let scale = 1;
         
-        // Create temporary container
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.left = '-9999px';
-        tempContainer.style.width = '1080px';
-        tempContainer.appendChild(clonedCanvas);
-        document.body.appendChild(tempContainer);
+        if (transform && transform !== 'none') {
+          const matrix = transform.match(/^matrix\((.+)\)$/);
+          if (matrix) {
+            const values = matrix[1].split(', ');
+            scale = parseFloat(values[0]);
+          }
+        }
         
-        // Configure html2pdf options
-        const opt = {
-          margin: 0,
-          filename: `poster-layout-${currentLayout}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, allowTaint: true },
-          jsPDF: { format: [1080, 1350], unit: 'px' }
-        };
+        // Convert to canvas at original size (1080x1350)
+        const canvas = await html2canvas(posterCanvas, {
+          scale: 1 / scale,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#FFFFFF'
+        });
         
-        // Generate PDF (which contains the PNG-like output)
-        await html2pdf().set(opt).from(clonedCanvas).save();
-        
-        // Clean up
-        document.body.removeChild(tempContainer);
+        // Create download link
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = `poster-layout-${currentLayout}.png`;
+        link.click();
         
         btn.disabled = false;
         btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG';
@@ -1338,5 +1338,5 @@
     // Init icons
     lucide.createIcons();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9a7acf75e65d0f',t:'MTc3NTc0Nzg1OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9aa9dea5f00807',t:'MTc3NTc0OTc4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
