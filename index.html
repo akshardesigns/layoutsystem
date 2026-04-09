@@ -25,6 +25,13 @@
   </script>
   <style>
     html, body { height: 100%; margin: 0; }
+   #posterWrapper {
+  margin: 0 auto;
+}
+
+.poster-wrapper {
+  overflow: visible !important;
+}
     .poster-canvas {
       width: 1080px;
       height: 1350px;
@@ -985,7 +992,7 @@
     </div>
 
     <!-- 🔥 PREVIEW (SUDAH PINDAH KE DALAM) -->
-    <div class="py-10 flex justify-center">
+    <div class="py-10 flex justify-center overflow-visible">
       <div class="poster-wrapper" id="posterWrapper">
         <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
 
@@ -1316,10 +1323,11 @@
   if (scale > 0.55) scale = 0.55;
 
   wrapper.style.transform = `scale(${scale})`;
+  wrapper.style.transformOrigin = 'top center';
 
-  // 🔥 PENTING: width tetap, height JANGAN dikali scale
+  // 🔥 biarin size asli (JANGAN ikut scale)
   wrapper.style.width = '1080px';
-  wrapper.style.height = '1350px'; // FIX utama
+  wrapper.style.height = '1350px';
 }
 
     window.addEventListener('resize', scalePoster);
