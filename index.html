@@ -1328,10 +1328,12 @@
     // --- Poster scaling ---
  function scalePoster() {
   const wrapper = document.getElementById('posterWrapper');
-  const container = wrapper.parentElement; // 🔥 ambil parent (field area)
+  const container = wrapper.parentElement;
 
-  const available = container.offsetWidth; // ✅ ini kuncinya
-  const scale = available / 1080;
+  const available = container.offsetWidth;
+
+  // 🔥 tambahin limit biar gak kegedean
+  const scale = Math.min(available / 1080, 0.6);
 
   wrapper.style.transform = `scale(${scale})`;
   wrapper.style.transformOrigin = 'top center';
