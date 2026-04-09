@@ -1308,23 +1308,18 @@
     // --- Poster scaling ---
     function scalePoster() {
   const wrapper = document.getElementById('posterWrapper');
-
-  // 🔥 ambil lebar container (bukan layar)
   const container = wrapper.parentElement;
-  const containerWidth = container.offsetWidth;
 
-  // kasih padding biar gak mepet
-  const maxWidth = containerWidth - 32;
-
-  // scale berdasarkan container
+  const maxWidth = container.offsetWidth - 32;
   let scale = maxWidth / 1080;
 
-  // 🔥 batas biar gak kegedean di desktop
   if (scale > 0.55) scale = 0.55;
 
   wrapper.style.transform = `scale(${scale})`;
+
+  // 🔥 PENTING: width tetap, height JANGAN dikali scale
   wrapper.style.width = '1080px';
-  wrapper.style.height = `${1350 * scale}px`;
+  wrapper.style.height = '1350px'; // FIX utama
 }
 
     window.addEventListener('resize', scalePoster);
