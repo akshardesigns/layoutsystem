@@ -1193,78 +1193,6 @@
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, 1080, 1350);
 
-        // Get image from poster
-        const imgSrc = document.querySelector('#p_hero img')?.src;
-        if (imgSrc) {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.src = imgSrc;
-
-          await new Promise(resolve => {
-            img.onload = resolve;
-            img.onerror = resolve;
-          });
-
-          // Position based on current layout - match CSS exactly
-          let x, y, w, h;
-          if (currentLayout === 1) {
-            x = 40; y = 490; w = 1000; h = 520;
-          } else if (currentLayout === 2) {
-            x = 540; y = 40; w = 480; h = 1270;
-          } else if (currentLayout === 3) {
-            x = 40; y = 20; w = 1000; h = 600;
-          } else if (currentLayout === 4) {
-            x = 40; y = 40; w = 486; h = 800;
-          } else if (currentLayout === 5) {
-            x = 240; y = 50; w = 600; h = 500;
-          } else if (currentLayout === 6) {
-            x = 0; y = 0; w = 0; h = 0; // No hero image in layout 6
-          } else if (currentLayout === 7) {
-            x = 0; y = 0; w = 0; h = 0; // No hero image in layout 7
-          } else if (currentLayout === 8) {
-            x = 340; y = 150; w = 744; h = 432;
-          } else if (currentLayout === 9) {
-            x = 0; y = 450; w = 1080; h = 900;
-          }
-
-          // Only draw image if position is valid
-          if (w > 0 && h > 0) {
-            // Cover crop
-            const imgRatio = img.width / img.height;
-            const boxRatio = w / h;
-            let drawWidth, drawHeight, offsetX, offsetY;
-
-            if (imgRatio > boxRatio) {
-              drawHeight = h;
-              drawWidth = h * imgRatio;
-              offsetX = -(drawWidth - w) / 2;
-              offsetY = 0;
-            } else {
-              drawWidth = w;
-              drawHeight = w / imgRatio;
-              offsetX = 0;
-              offsetY = -(drawHeight - h) / 2;
-            }
-
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(x, y, w, h);
-            ctx.clip();
-            ctx.drawImage(img, x + offsetX, y + offsetY, drawWidth, drawHeight);
-            ctx.restore();
-
-            // Gradient overlay for layouts 1, 3, 5, 9
-            if (currentLayout === 1 || currentLayout === 3 || currentLayout === 5 || currentLayout === 9) {
-              const gradient = ctx.createLinearGradient(0, y, 0, y + h);
-              gradient.addColorStop(0, 'rgba(255,255,255,0)');
-              gradient.addColorStop(0.7, 'rgba(255,255,255,0)');
-              gradient.addColorStop(1, '#ffffff');
-              ctx.fillStyle = gradient;
-              ctx.fillRect(x, y, w, h);
-            }
-          }
-        }
-
         // Get text content & color
         const color = document.getElementById('inp_color').value;
         const judul = document.getElementById('p_headline').textContent.trim();
@@ -1274,344 +1202,528 @@
         const desc1 = document.getElementById('p_desc1').textContent.trim();
         const desc2 = document.getElementById('p_desc2').textContent.trim();
 
-        // Layout-specific positioning - EXACT CSS matching
+        // Helper: Load image
+        const loadImage = (src) => {
+          return new Promise((resolve) => {
+            if (!src) {
+              resolve(null);
+              return;
+            }
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = src;
+          });
+        };
+
+        // Helper: Draw image with cover crop
+        const drawImage = (img, x, y, w, h, withGradient = false) => {
+          if (!img) return;
+          
+          const imgRatio = img.width / img.height;
+          const boxRatio = w / h;
+          let drawWidth, drawHeight, offsetX, offsetY;
+
+          if (imgRatio > boxRatio) {
+            drawHeight = h;
+            drawWidth = h * imgRatio;
+            offsetX = -(drawWidth - w) / 2;
+            offsetY = 0;
+          } else {
+            drawWidth = w;
+            drawHeight = w / imgRatio;
+            offsetX = 0;
+            offsetY = -(drawHeight - h) / 2;
+          }
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(x, y, w, h);
+          ctx.clip();
+          ctx.drawImage(img, x + offsetX, y + offsetY, drawWidth, drawHeight);
+          ctx.restore();
+
+          // Gradient overlay
+          if (withGradient) {
+            const grad = ctx.createLinearGradient(0, y, 0, y + h);
+            grad.addColorStop(0, 'rgba(255,255,255,0)');
+            grad.addColorStop(0.7, 'rgba(255,255,255,0)');
+            grad.addColorStop(1, '#ffffff');
+            ctx.fillStyle = grad;
+            ctx.fillRect(x, y, w, h);
+          }
+        };
+
         if (currentLayout === 1) {
-          // LAYOUT 1 - Centered, full-width
-          // headline - top: 50px, centered, 138px
+          // ===== LAYOUT 1 =====
+          const imgSrc = document.querySelector('#p_hero img')?.src;
+          const img = await loadImage(imgSrc);
+          drawImage(img, 40, 490, 1000, 520, true);
+
+          // headline
           ctx.fillStyle = color;
-          ctx.font = 'bold 138px "Playfair Display", serif';
+          ctx.font = '900 138px "Playfair Display", serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, judul, 540, 50, 1000, 138 * 0.9, 'center', true);
+          ctx.fillText(judul, 540, 50);
 
-          // sub-headline - top: 360px, centered, 28px
+          // sub
           ctx.fillStyle = '#1f2937';
-          ctx.font = 'bold 28px "DM Sans", sans-serif';
-          drawWrappedText(ctx, sub, 540, 360, 1000, 34, 'center', true);
+          ctx.font = '700 28px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(sub, 540, 360);
 
-          // info-bar - top: 1080px, centered, 11px
+          // info
           ctx.fillStyle = '#1f2937';
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
-          ctx.textBaseline = 'top';
           ctx.fillText(info, 540, 1080);
 
-          // two-col-text - top: 1130px
+          // desc1 & desc2
           ctx.fillStyle = '#374151';
           ctx.font = '300 17px "DM Sans", sans-serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, desc1, 60, 1130, 440, 28, 'left', true);
-          drawWrappedText(ctx, desc2, 1020, 1130, 440, 28, 'right', true);
+          ctx.fillText(desc1, 60, 1130);
+          ctx.textAlign = 'right';
+          ctx.fillText(desc2, 1020, 1130);
 
-          // tagline - bottom: 50px = 1300px, left, 13px
+          // tagline
           ctx.fillStyle = color;
           ctx.font = '13px "Space Mono", monospace';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'bottom';
-          ctx.fillText(tagline, 40, 1350);
+          ctx.fillText(tagline, 40, 1340);
 
         } else if (currentLayout === 2) {
-          // LAYOUT 2 - 50/50 split, image right
-          // tagline - top: 40px, left, 12px
+          // ===== LAYOUT 2 =====
+          const imgSrc = document.querySelector('#p_hero img')?.src;
+          const img = await loadImage(imgSrc);
+          drawImage(img, 540, 40, 480, 1270, false);
+
+          // Gradient fade on right image
+          const grad = ctx.createLinearGradient(540, 40, 540 + 480, 40);
+          grad.addColorStop(0, 'rgba(255,255,255,0)');
+          grad.addColorStop(1, '#ffffff');
+          ctx.fillStyle = grad;
+          ctx.fillRect(540, 40, 480, 1270);
+
+          // tagline
           ctx.fillStyle = color;
           ctx.font = '12px "Space Mono", monospace';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillText(tagline, 40, 40);
 
-          // headline - top: 750px, left, 88px (left 40px, right 50%)
+          // headline
           ctx.fillStyle = color;
-          ctx.font = 'bold 88px "Playfair Display", serif';
+          ctx.font = '900 88px "Playfair Display", serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, judul, 40, 750, 460, 88 * 0.9, 'left', true);
+          ctx.fillText(judul, 40, 750);
 
-          // sub-headline - top: 950px, left, 20px
+          // sub
           ctx.fillStyle = '#1f2937';
-          ctx.font = 'bold 20px "DM Sans", sans-serif';
+          ctx.font = '700 20px "DM Sans", sans-serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, sub, 40, 950, 460, 24, 'left', true);
+          ctx.fillText(sub, 40, 950);
 
-          // two-col-text - top: 1020px, single column
+          // desc
           ctx.fillStyle = '#374151';
           ctx.font = '300 14px "DM Sans", sans-serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, desc1, 40, 1020, 460, 20, 'left', true);
-          drawWrappedText(ctx, desc2, 40, 1070, 460, 20, 'left', true);
+          ctx.fillText(desc1, 40, 1020);
+          ctx.fillText(desc2, 40, 1070);
 
-          // info-bar - bottom: 50px = 1300px, right
+          // info
           ctx.fillStyle = '#1f2937';
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'right';
           ctx.textBaseline = 'bottom';
-          ctx.fillText(info, 1040, 1350);
-
-          // brand - bottom: 50px, left
-          // (logo handled separately)
+          ctx.fillText(info, 1040, 1340);
 
         } else if (currentLayout === 3) {
-          // LAYOUT 3 - Full width image top
-          // hero-image-area - top: 20px (handled above)
+          // ===== LAYOUT 3 =====
+          const imgSrc = document.querySelector('#p_hero img')?.src;
+          const img = await loadImage(imgSrc);
+          drawImage(img, 40, 20, 1000, 600, true);
 
-          // tagline - bottom: 40px = 1310px, left, 11px
+          // tagline
           ctx.fillStyle = color;
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'bottom';
-          ctx.fillText(tagline, 40, 1350);
+          ctx.fillText(tagline, 40, 1340);
 
-          // headline - top: 700px, centered, 120px
+          // headline
           ctx.fillStyle = color;
-          ctx.font = 'bold 120px "Playfair Display", serif';
+          ctx.font = '900 120px "Playfair Display", serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, judul, 540, 700, 1000, 120 * 0.9, 'center', true);
+          ctx.fillText(judul, 540, 700);
 
-          // sub-headline - top: 970px, centered, 20px
+          // sub
           ctx.fillStyle = '#1f2937';
-          ctx.font = 'bold 20px "DM Sans", sans-serif';
+          ctx.font = '700 20px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, sub, 540, 970, 1000, 24, 'center', true);
+          ctx.fillText(sub, 540, 970);
 
-          // info-bar - top: 650px, centered
+          // info
           ctx.fillStyle = '#1f2937';
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
           ctx.fillText(info, 540, 650);
 
-          // two-col-text - top: 1060px, centered
+          // desc
           ctx.fillStyle = '#374151';
           ctx.font = '300 14px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, desc1, 540, 1060, 800, 20, 'center', true);
-          drawWrappedText(ctx, desc2, 540, 1090, 800, 20, 'center', true);
+          ctx.fillText(desc1, 540, 1060);
+          ctx.fillText(desc2, 540, 1090);
 
         } else if (currentLayout === 4) {
-          // LAYOUT 4 - Diagonal: image left, text right
-          // image: top: 40px, left: 40px, width: 45%, height: 800px
+          // ===== LAYOUT 4 =====
+          const imgSrc = document.querySelector('#p_hero img')?.src;
+          const img = await loadImage(imgSrc);
+          drawImage(img, 40, 40, 486, 800, false);
 
-          // tagline - top: 40px, left: 55% = 594px, 12px
+          // tagline
           ctx.fillStyle = color;
           ctx.font = '12px "Space Mono", monospace';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillText(tagline, 594, 40);
 
-          // headline - top: 400px, left: 55%, 96px
+          // headline
           ctx.fillStyle = color;
-          ctx.font = 'bold 96px "Playfair Display", serif';
+          ctx.font = '900 96px "Playfair Display", serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, judul, 594, 400, 446, 96 * 0.9, 'left', true);
+          ctx.fillText(judul, 594, 400);
 
-          // sub-headline - top: 700px, left: 55%, 18px
+          // sub
           ctx.fillStyle = '#1f2937';
-          ctx.font = 'bold 18px "DM Sans", sans-serif';
+          ctx.font = '700 18px "DM Sans", sans-serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, sub, 594, 700, 446, 22, 'left', true);
+          ctx.fillText(sub, 594, 700);
 
-          // info-bar - bottom: 300px = 1050px, left: 55%
+          // info
           ctx.fillStyle = '#1f2937';
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillText(info, 594, 1050);
 
-          // two-col-text - top: 800px, left: 55%
+          // desc
           ctx.fillStyle = '#374151';
           ctx.font = '300 13px "DM Sans", sans-serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, desc1, 594, 800, 446, 20, 'left', true);
-          drawWrappedText(ctx, desc2, 594, 860, 446, 20, 'left', true);
-
-          // brand - bottom: 40px, right: 40px
-          // (logo handled separately)
+          ctx.fillText(desc1, 594, 800);
+          ctx.fillText(desc2, 594, 860);
 
         } else if (currentLayout === 5) {
-          // LAYOUT 5 - Centered image & text
-          // image: centered at top: 50px
+          // ===== LAYOUT 5 =====
+          const imgSrc = document.querySelector('#p_hero img')?.src;
+          const img = await loadImage(imgSrc);
+          drawImage(img, 240, 50, 600, 500, true);
 
-          // tagline - top: 20px, centered, 11px
+          // tagline
           ctx.fillStyle = color;
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
           ctx.fillText(tagline, 540, 20);
 
-          // info-bar - top: 550px, centered
+          // info
           ctx.fillStyle = '#1f2937';
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
           ctx.fillText(info, 540, 550);
 
-          // headline - top: 590px, centered, 110px
+          // headline
           ctx.fillStyle = color;
-          ctx.font = 'bold 110px "Playfair Display", serif';
+          ctx.font = '900 110px "Playfair Display", serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, judul, 540, 590, 900, 110 * 0.95, 'center', true);
+          ctx.fillText(judul, 540, 590);
 
-          // sub-headline - top: 827px, centered, 19px
+          // sub
           ctx.fillStyle = '#1f2937';
-          ctx.font = 'bold 19px "DM Sans", sans-serif';
+          ctx.font = '700 19px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, sub, 540, 827, 900, 23, 'center', true);
+          ctx.fillText(sub, 540, 827);
 
-          // two-col-text - top: 888px, centered
+          // desc
           ctx.fillStyle = '#4b5563';
           ctx.font = '300 20px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, desc1, 540, 888, 600, 26, 'center', true);
-          drawWrappedText(ctx, desc2, 540, 950, 600, 26, 'center', true);
-
-          // brand - bottom: 40px, right: 40px
+          ctx.fillText(desc1, 540, 888);
+          ctx.fillText(desc2, 540, 950);
 
         } else if (currentLayout === 6) {
-          // LAYOUT 6 - Center overlay
-          // tagline - top: 80px, centered, 12px
+          // ===== LAYOUT 6 - Side images =====
+          const leftImgSrc = document.getElementById('p_side_image_left')?.src;
+          const rightImgSrc = document.getElementById('p_side_image_right')?.src;
+          
+          const leftImg = await loadImage(leftImgSrc);
+          const rightImg = await loadImage(rightImgSrc);
+
+          // Draw left image with fade mask
+          if (leftImg) {
+            ctx.save();
+            ctx.globalAlpha = 0.35;
+            const imgRatio = leftImg.width / leftImg.height;
+            const w = 324;
+            const h = 1270;
+            const drawHeight = h;
+            const drawWidth = h * imgRatio;
+            const offsetX = -(drawWidth - w) / 2;
+            ctx.drawImage(leftImg, 40 + offsetX, 40, drawWidth, drawHeight);
+            
+            // Apply fade gradient mask
+            const grad = ctx.createLinearGradient(40, 40, 364, 40);
+            grad.addColorStop(0, 'rgba(255,255,255,0.35)');
+            grad.addColorStop(0.6, 'rgba(255,255,255,0)');
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = grad;
+            ctx.fillRect(40, 40, 324, 1270);
+            ctx.restore();
+          }
+
+          // Draw right image with fade mask
+          if (rightImg) {
+            ctx.save();
+            ctx.globalAlpha = 0.35;
+            const imgRatio = rightImg.width / rightImg.height;
+            const w = 324;
+            const h = 1270;
+            const drawHeight = h;
+            const drawWidth = h * imgRatio;
+            const offsetX = -(drawWidth - w) / 2;
+            ctx.drawImage(rightImg, 756 + offsetX, 40, drawWidth, drawHeight);
+            
+            // Apply fade gradient mask
+            const grad = ctx.createLinearGradient(1040, 40, 716, 40);
+            grad.addColorStop(0, 'rgba(255,255,255,0.35)');
+            grad.addColorStop(0.6, 'rgba(255,255,255,0)');
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = grad;
+            ctx.fillRect(716, 40, 324, 1270);
+            ctx.restore();
+          }
+
+          // tagline
           ctx.fillStyle = color;
           ctx.font = '12px "Space Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
           ctx.fillText(tagline, 540, 80);
 
-          // sub-headline - top: 400px, centered, 20px
+          // sub
           ctx.fillStyle = '#1f2937';
-          ctx.font = 'bold 20px "DM Sans", sans-serif';
+          ctx.font = '700 20px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, sub, 540, 400, 600, 24, 'center', true);
+          ctx.fillText(sub, 540, 400);
 
-          // headline - top: 440px, centered, 140px (font-weight: 500)
+          // headline
           ctx.fillStyle = color;
           ctx.font = '500 140px "Playfair Display", serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, judul, 540, 440, 600, 140 * 0.95, 'center', true);
+          ctx.fillText(judul, 540, 440);
 
-          // info-bar - top: 880px, centered
+          // info
           ctx.fillStyle = '#1f2937';
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
           ctx.fillText(info, 540, 880);
 
-          // two-col-text - top: 950px, centered
+          // desc
           ctx.fillStyle = '#374151';
           ctx.font = '300 14px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, desc1, 540, 950, 600, 20, 'center', true);
-          drawWrappedText(ctx, desc2, 540, 980, 600, 20, 'center', true);
-
-          // brand - bottom: 40px, right: 40px
+          ctx.fillText(desc1, 540, 950);
+          ctx.fillText(desc2, 540, 980);
 
         } else if (currentLayout === 7) {
-          // LAYOUT 7 - Side circles + centered text
-          // tagline - top: 60px, left: 40px, 13.2px
+          // ===== LAYOUT 7 - Circular images =====
+          const leftImgSrc = document.getElementById('p_side_image_left')?.src;
+          const rightImgSrc = document.getElementById('p_side_image_right')?.src;
+          
+          const leftImg = await loadImage(leftImgSrc);
+          const rightImg = await loadImage(rightImgSrc);
+
+          // Draw right circle (small, top-right)
+          if (rightImg) {
+            const x = 940;
+            const y = 420;
+            const size = 280;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI * 2);
+            ctx.clip();
+            const imgRatio = rightImg.width / rightImg.height;
+            const drawHeight = size;
+            const drawWidth = size * imgRatio;
+            const offsetX = -(drawWidth - size) / 2;
+            ctx.drawImage(rightImg, x + offsetX, y, drawWidth, drawHeight);
+            ctx.restore();
+          }
+
+          // Draw left circle (large, bottom-left)
+          if (leftImg) {
+            const x = 40;
+            const y = 970;
+            const size = 380;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI * 2);
+            ctx.clip();
+            const imgRatio = leftImg.width / leftImg.height;
+            const drawHeight = size;
+            const drawWidth = size * imgRatio;
+            const offsetX = -(drawWidth - size) / 2;
+            ctx.drawImage(leftImg, x + offsetX, y, drawWidth, drawHeight);
+            ctx.restore();
+          }
+
+          // tagline
           ctx.fillStyle = color;
           ctx.font = '13.2px "Space Mono", monospace';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillText(tagline, 40, 60);
 
-          // headline - top: 80px, left: 40px, 160px (font-weight: 500)
+          // headline
           ctx.fillStyle = color;
           ctx.font = '500 160px "Playfair Display", serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, judul, 40, 80, 500, 160, 'left', true);
+          ctx.fillText(judul, 40, 80);
 
-          // sub-headline - top: 645px, left: 40px, 28px
+          // sub
           ctx.fillStyle = '#1f2937';
-          ctx.font = 'bold 28px "DM Sans", sans-serif';
+          ctx.font = '700 28px "DM Sans", sans-serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, sub, 40, 645, 500, 32, 'left', true);
+          ctx.fillText(sub, 40, 645);
 
-          // info-bar - bottom: 50px = 1300px, left: 40px
+          // info
           ctx.fillStyle = '#1f2937';
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'bottom';
-          ctx.fillText(info, 40, 1350);
+          ctx.fillText(info, 40, 1340);
 
-          // two-col-text - bottom: 120px = 1230px, right: 40px
+          // desc
           ctx.fillStyle = '#374151';
           ctx.font = '300 22.1px "DM Sans", sans-serif';
           ctx.textAlign = 'right';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, desc1, 920, 1100, 420, 28, 'right', true);
-          drawWrappedText(ctx, desc2, 920, 1150, 420, 28, 'right', true);
-
-          // brand - bottom: 40px, right: 40px
+          ctx.fillText(desc1, 920, 1100);
+          ctx.fillText(desc2, 920, 1150);
 
         } else if (currentLayout === 8) {
-          // LAYOUT 8 - Right image, left text stacked
-          // tagline - top: 60px, left: 40px, 33px
+          // ===== LAYOUT 8 =====
+          const imgSrc = document.querySelector('#p_hero img')?.src;
+          const img = await loadImage(imgSrc);
+          drawImage(img, 340, 150, 744, 432, false);
+
+          // tagline
           ctx.fillStyle = color;
           ctx.font = '33px "Helvetica Neue", Helvetica, Arial, sans-serif';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillText(tagline, 40, 60);
 
-          // headline - top: 567.5px, left: 100px, 149.5px (font-weight: 700)
+          // headline
           ctx.fillStyle = color;
-          ctx.font = 'bold 149.5px "Helvetica Neue", Helvetica, Arial, sans-serif';
+          ctx.font = '700 149.5px "Helvetica Neue", Helvetica, Arial, sans-serif';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, judul, 100, 567.5, 780, 149.5 * 0.95, 'left', true);
+          ctx.fillText(judul, 100, 567.5);
 
-          // sub-headline - top: 1029px, left: 100px, 26px (font-weight: 500)
+          // sub
           ctx.fillStyle = '#1f2937';
           ctx.font = '500 26px "Helvetica Neue", Helvetica, Arial, sans-serif';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, sub, 100, 1029, 600, 31, 'left', true);
+          ctx.fillText(sub, 100, 1029);
 
-          // info-bar - top: 1180px, left: 100px, 21px (font-weight: 500)
+          // info
           ctx.fillStyle = '#1f2937';
           ctx.font = '500 21px "Helvetica Neue", Helvetica, Arial, sans-serif';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillText(info, 100, 1180);
 
-          // two-col-text - bottom: 310px = 1040px, right: 40px
+          // desc
           ctx.fillStyle = '#374151';
           ctx.font = '300 13px "DM Sans", sans-serif';
           ctx.textAlign = 'right';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, desc1, 920, 1040, 200, 18, 'right', true);
-          drawWrappedText(ctx, desc2, 920, 1080, 200, 18, 'right', true);
+          ctx.fillText(desc1, 920, 1040);
+          ctx.fillText(desc2, 920, 1080);
 
-          // brand - bottom: 40px, left: 40px
+          // Bottom line
+          ctx.fillStyle = color;
+          ctx.fillRect(100, 1240, 680, 10);
 
         } else if (currentLayout === 9) {
-          // LAYOUT 9 - Image bottom, text top
-          // tagline - top: 40px, left: 40px, 11px
+          // ===== LAYOUT 9 =====
+          const imgSrc = document.querySelector('#p_hero img')?.src;
+          const img = await loadImage(imgSrc);
+          drawImage(img, 0, 450, 1080, 900, true);
+
+          // tagline
           ctx.fillStyle = color;
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillText(tagline, 40, 40);
 
-          // info-bar - top: 145px, centered
+          // info
           ctx.fillStyle = '#1f2937';
           ctx.font = '11px "Space Mono", monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
           ctx.fillText(info, 540, 145);
 
-          // headline - top: 167.5px, centered, 99.2px (font-weight: 500)
+          // headline
           ctx.fillStyle = color;
           ctx.font = '500 99.2px "Playfair Display", serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, judul, 540, 167.5, 900, 99.2 * 1.1, 'center', true);
+          ctx.fillText(judul, 540, 167.5);
 
-          // sub-headline - top: 386px, centered, 19px
+          // sub
           ctx.fillStyle = '#1f2937';
-          ctx.font = 'bold 19px "DM Sans", sans-serif';
+          ctx.font = '700 19px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, sub, 540, 386, 900, 23, 'center', true);
+          ctx.fillText(sub, 540, 386);
 
-          // two-col-text - top: 470px, centered
+          // desc
           ctx.fillStyle = '#374151';
           ctx.font = '300 14px "DM Sans", sans-serif';
+          ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
-          drawWrappedText(ctx, desc1, 540, 470, 600, 20, 'center', true);
-          drawWrappedText(ctx, desc2, 540, 500, 600, 20, 'center', true);
-
-          // brand - top: 50px, right: 40px
+          ctx.fillText(desc1, 540, 470);
+          ctx.fillText(desc2, 540, 500);
         }
 
         // Download
@@ -1747,5 +1859,5 @@
     // Init icons
     lucide.createIcons();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9a4aa8b73df8fb',t:'MTc3NTc0NTg4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9a5d01c146ec69',t:'MTc3NTc0NjYzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
