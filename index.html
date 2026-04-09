@@ -27,7 +27,12 @@
    html, body {
   overflow-x: hidden;
 }
-
+.max-w-\[900px\] {
+  overflow: hidden;
+}
+#posterWrapper {
+  margin: 0 auto;
+}
 .poster-wrapper {
   max-width: 100%;
   display: flex;
@@ -1006,7 +1011,7 @@
     </div>
 
    <!-- 🔥 PREVIEW -->
-<div class="py-6 px-4 flex justify-center w-full">
+<div class="py-6 flex justify-center w-full">
 
   <div class="w-full max-w-[900px] flex justify-center">
     
@@ -1331,13 +1336,17 @@
     // --- Poster scaling ---
      function scalePoster() {  
   const wrapper = document.getElementById('posterWrapper');  
-  const available = Math.min(window.innerWidth - 48, 900);  
-  const scale = Math.min(available / 1080, 0.55);  
-  
-  wrapper.style.transform = `scale(${scale})`;  
-  wrapper.style.width = '1080px';  
-  wrapper.style.height = `${1350 * scale}px`;  
-}  
+  const container = wrapper.closest('.max-w-[900px]'); // 🔥 INI KUNCINYA
+
+  const availableWidth = container.offsetWidth;
+  const scale = Math.min(availableWidth / 1080, 0.55);
+
+  wrapper.style.transform = `scale(${scale})`;
+  wrapper.style.transformOrigin = 'top center';
+
+  wrapper.style.width = '1080px';
+  wrapper.style.height = `${1350 * scale}px`;
+}
 
     window.addEventListener('resize', scalePoster);
     scalePoster();
