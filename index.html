@@ -1306,24 +1306,21 @@
     });
 
     // --- Poster scaling ---
-    ffunction scalePoster() {
+    function scalePoster() {
   const wrapper = document.getElementById('posterWrapper');
-  const screenWidth = window.innerWidth;
 
-  let scale;
+  // 🔥 ambil lebar container (bukan layar)
+  const container = wrapper.parentElement;
+  const containerWidth = container.offsetWidth;
 
-  // 🔥 HP → full width (fix utama lo)
-  if (screenWidth < 480) {
-    scale = (screenWidth - 24) / 1080;
-  } 
-  // Tablet
-  else if (screenWidth < 900) {
-    scale = (screenWidth - 48) / 1080;
-  } 
-  // Desktop
-  else {
-    scale = 0.55;
-  }
+  // kasih padding biar gak mepet
+  const maxWidth = containerWidth - 32;
+
+  // scale berdasarkan container
+  let scale = maxWidth / 1080;
+
+  // 🔥 batas biar gak kegedean di desktop
+  if (scale > 0.55) scale = 0.55;
 
   wrapper.style.transform = `scale(${scale})`;
   wrapper.style.width = '1080px';
