@@ -1326,25 +1326,15 @@
     });
 
     // --- Poster scaling ---
-    function scalePoster() {
-  const wrapper = document.getElementById('posterWrapper');
-  const container = wrapper.parentElement;
-
-  const maxWidth = container.offsetWidth - 32;
-  let scale = maxWidth / 1080;
-
-  if (scale > 0.55) scale = 0.55;
-
-  wrapper.style.transform = `scale(${scale})`;
-  wrapper.style.transformOrigin = 'top center';
-
-  // 🔥 penting
-  wrapper.style.width = '1080px';
-  wrapper.style.height = 'auto';
-
-  // 🔥 ini kunci biar gak kepotong
-  container.style.height = `${1350 * scale}px`;
-}
+     function scalePoster() {  
+  const wrapper = document.getElementById('posterWrapper');  
+  const available = Math.min(window.innerWidth - 48, 900);  
+  const scale = Math.min(available / 1080, 0.55);  
+  
+  wrapper.style.transform = `scale(${scale})`;  
+  wrapper.style.width = '1080px';  
+  wrapper.style.height = `${1350 * scale}px`;  
+}  
 
     window.addEventListener('resize', scalePoster);
     scalePoster();
