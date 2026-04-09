@@ -8,6 +8,7 @@
   <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&amp;family=DM+Sans:wght@300;400;500;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
   <script>
@@ -24,19 +25,7 @@
     }
   </script>
   <style>
-   html, body { height: 100%; margin: 0; }  
-    .poster-canvas {  
-      width: 1080px;  
-      height: 1350px;  
-      position: relative;  
-      overflow: hidden; 
-   #posterWrapper {
-  margin: 0 auto;
-}
-
-.poster-wrapper {
-  overflow: visible !important;
-}
+    html, body { height: 100%; margin: 0; }
     .poster-canvas {
       width: 1080px;
       height: 1350px;
@@ -916,19 +905,6 @@
     }
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
     input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 6px; }
-  body {
-  overflow-x: hidden;
-}
-
-#posterWrapper {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.poster-wrapper {
-  display: flex;
-  justify-content: center;
-}
   </style>
   <style>body { box-sizing: border-box; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
@@ -983,96 +959,61 @@
      </div>
     </div>
    </div><!-- Layout Selector -->
-
-<div class="px-6 py-4 border-b border-neutral-200 bg-neutral-50">
-
-  <!-- 🔥 TAMBAHAN WRAPPER (INI KUNCI FIX) -->
-  <div class="flex flex-col items-center gap-6 w-full">
-
-    <!-- TOP BAR -->
-    <div class="flex items-center gap-3">
-      <button id="prevBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors">
-        <i data-lucide="chevron-left" style="width:16px;height:16px;"></i>
-      </button>
-
-      <div class="text-center min-w-20">
-        <p id="layoutIndicator" class="text-[12px] font-semibold text-neutral-900">Layout 1</p>
-        <p class="text-[10px] text-neutral-400 font-mono">1 / 9</p>
-      </div>
-
-      <button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors">
-        <i data-lucide="chevron-right" style="width:16px;height:16px;"></i>
-      </button>
-
-      <button id="downloadBtn" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-2">
-        <i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG
-      </button>
-    </div>
-
-    <!-- 🔥 PREVIEW (SUDAH PINDAH KE DALAM) -->
-    <div class="py-10 flex justify-center overflow">
-      <div class="poster-wrapper" id="posterWrapper">
-        <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
-
-          <!-- Headline BG -->
-          <div class="headline-bg" id="p_headline" style="color:#C8553D;">
-            BEYOND THE EDGE
-          </div>
-
-          <!-- Hero Image -->
-          <div class="hero-image-area" id="p_hero">
-            <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);" id="p_hero_placeholder">
-              <div class="text-center text-neutral-300">
-                <i data-lucide="image" style="width:48px;height:48px;margin:0 auto;display:block"></i>
-                <p class="text-xs font-mono mt-3 tracking-wider uppercase">Upload Visual Hook</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Side Images -->
-          <img id="p_side_image_left" class="side-image-left" style="display:none;" alt="">
-          <img id="p_side_image_center" class="side-image-center" style="display:none;" alt="">
-          <img id="p_side_image_right" class="side-image-right" style="display:none;" alt="">
-
-          <!-- Sub -->
-          <div class="sub-headline" id="p_sub" style="color:#1f2937;">
-            Exploring the invisible boundaries of modern creative culture
-          </div>
-
-          <!-- Tagline -->
-          <div class="tagline-area" id="p_tagline" style="color:#C8553D;">
-            FORM FOLLOWS FEELING
-          </div>
-
-          <!-- Info -->
-          <div class="info-bar" id="p_info_bar">
-            <span id="p_info">VOL. 03 — 2025 EDITION</span>
-            <div class="line" id="p_info_line"></div>
-          </div>
-
-          <!-- Desc -->
-          <div class="two-col-text">
-            <div id="p_desc1">A visual essay...</div>
-            <div id="p_desc2">Through careful composition...</div>
-          </div>
-
-          <!-- Brand -->
-          <div class="brand-area" id="p_brand"></div>
-
-          <div class="top-right-line"></div>
-          <div class="layout-8-anchor-line" id="p_layout8_line"></div>
-
+   <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50">
+    <div class="flex items-center gap-3"><button id="prevBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-left" style="width:16px;height:16px;"></i></button>
+     <div class="text-center min-w-20">
+      <p id="layoutIndicator" class="text-[12px] font-semibold text-neutral-900">Layout 1</p>
+      <p class="text-[10px] text-neutral-400 font-mono">1 / 9</p>
+     </div><button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></button>
+    </div><button id="downloadPdfBtn" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-2"><i data-lucide="download" style="width:14px;height:14px;"></i> Download PDF</button>
+   </div><!-- Live Preview -->
+   <div class="py-10 flex justify-center">
+    <div class="poster-wrapper" id="posterWrapper">
+     <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
+      <!-- Headline BG -->
+      <div class="headline-bg" id="p_headline" style="color:#C8553D;">
+       BEYOND THE EDGE
+      </div><!-- Hero Image -->
+      <div class="hero-image-area" id="p_hero">
+       <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);" id="p_hero_placeholder">
+        <div class="text-center text-neutral-300">
+         <i data-lucide="image" style="width:48px;height:48px;margin:0 auto;display:block"></i>
+         <p class="text-xs font-mono mt-3 tracking-wider uppercase">Upload Visual Hook</p>
         </div>
-      </div>
-
-      <!-- swipe indicator -->
-      <div class="swipe-indicator right">
-        <i data-lucide="chevron-right"></i>
-      </div>
-
+       </div>
+      </div><!-- Side Images for Layout 6 --> <img id="p_side_image_left" class="side-image-left" style="display:none;" alt="Side Image Left"> <img id="p_side_image_center" class="side-image-center" style="display:none;" alt="Center Image"> <img id="p_side_image_right" class="side-image-right" style="display:none;" alt="Side Image Right"> <!-- Sub Headline -->
+      <div class="sub-headline" id="p_sub" style="color:#1f2937;">
+       Exploring the invisible boundaries of modern creative culture
+      </div><!-- Tagline -->
+      <div class="tagline-area" id="p_tagline" style="color:#C8553D;">
+       FORM FOLLOWS FEELING
+      </div><!-- Info Bar -->
+      <div class="info-bar" id="p_info_bar">
+       <span style="color:#1f2937;" id="p_info">VOL. 03 — 2025 EDITION</span>
+       <div class="line" id="p_info_line" style="background:#e5e7eb;"></div>
+      </div><!-- Two Column Text -->
+      <div class="two-col-text">
+       <div class="col-text" id="p_desc1" style="color:#374151;">
+        A visual essay on the tension between minimalism and expression. We strip away the unnecessary to reveal what truly matters in design.
+       </div>
+       <div class="col-text" id="p_desc2" style="color:#374151;">
+        Through careful composition and deliberate restraint, each element finds its purpose. Nothing is accidental — every pixel is intentional.
+       </div>
+      </div><!-- Brand Area -->
+      <div class="brand-area" id="p_brand">
+       <div id="p_logo_placeholder" class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(255,255,255,0.08);">
+        <i data-lucide="hexagon" style="width:18px;height:18px;color:rgba(255,255,255,0.25)"></i>
+       </div>
+      </div><!-- Layout 7: Top right line -->
+      <div class="top-right-line"></div><!-- Layout 8: Bottom anchor line -->
+      <div class="layout-8-anchor-line" id="p_layout8_line"></div>
+     </div>
+     <div class="swipe-indicator right">
+      <i data-lucide="chevron-right"></i>
+     </div>
     </div>
+   </div>
   </div>
-</div>
   <script>
     // --- Element SDK (optional) ---
     if (window.elementSdk) {
@@ -1169,71 +1110,89 @@
     });
 
     // Download PDF
-    document.getElementById('downloadBtn').addEventListener('click', async () => {
-
-  const btn = document.getElementById('downloadBtn');
-  const posterCanvas = document.getElementById('posterCanvas');
-  const posterWrapper = document.getElementById('posterWrapper');
-
-  btn.disabled = true;
-  btn.innerHTML = 'Processing...';
-
-  try {
-
-    // 🔥 reset scale biar hasil 1:1
-    const originalTransform = posterWrapper.style.transform;
-    posterWrapper.style.transform = 'scale(1)';
-    posterWrapper.style.width = '1080px';
-    posterWrapper.style.height = '1350px';
-
-    // tunggu font
-    await document.fonts.ready;
-
-    // tunggu semua gambar
-    const images = posterCanvas.querySelectorAll('img');
-    await Promise.all([...images].map(img => {
-      if (img.complete) return Promise.resolve();
-      return new Promise(resolve => {
-        img.onload = img.onerror = resolve;
-      });
-    }));
-
-    // kasih delay biar render stabil
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    // 🔥 capture
-    const canvas = await html2canvas(posterCanvas, {
-      width: 1080,
-      height: 1350,
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: 1080,
-      windowHeight: 1350
+    document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('downloadPdfBtn');
+      const posterCanvas = document.getElementById('posterCanvas');
+      const posterWrapper = document.getElementById('posterWrapper');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px;"></i> Processing...';
+      lucide.createIcons();
+      
+      try {
+        // Reset poster to 100% scale temporarily for accurate capture
+        const originalTransform = posterWrapper.style.transform;
+        posterWrapper.style.transform = 'scale(1)';
+        posterWrapper.style.width = '1080px';
+        posterWrapper.style.height = '1350px';
+        
+        // Wait for fonts
+        await document.fonts.ready;
+        
+        // Wait for all images
+        const images = posterCanvas.querySelectorAll('img');
+        await Promise.all([...images].map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = img.onerror = resolve;
+          });
+        }));
+        
+        // Extra delay for rendering and layout recalculation
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Capture canvas at actual size
+        const canvas = await html2canvas(posterCanvas, {
+          allowTaint: true,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          scale: 1,
+          logging: false,
+          width: 1080,
+          height: 1350,
+          windowHeight: 1350
+        });
+        
+        // Create PDF
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: [210, 262.5]
+        });
+        
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 0, 0, 210, 262.5);
+        
+        // Open in new tab and user can save from there
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, '_blank');
+        
+        // Clean up
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+        
+        // Restore scale
+        posterWrapper.style.transform = originalTransform;
+        await new Promise(resolve => setTimeout(resolve, 100));
+        scalePoster();
+        
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PDF';
+        lucide.createIcons();
+        
+      } catch (error) {
+        console.error('Download error:', error);
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Error';
+        lucide.createIcons();
+        
+        setTimeout(() => {
+          btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PDF';
+          lucide.createIcons();
+        }, 2000);
+      }
     });
-
-    // 🔥 download PNG
-    const link = document.createElement('a');
-    link.download = 'poster.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-
-    // balikin scale preview
-    posterWrapper.style.transform = originalTransform;
-    scalePoster();
-
-    btn.disabled = false;
-    btn.innerHTML = 'Download PNG';
-
-  } catch (error) {
-    console.error(error);
-    btn.innerHTML = 'Error';
-    btn.disabled = false;
-  }
-
-});
     
     // Touch swipe support on poster wrapper
     const posterWrapper = document.getElementById('posterWrapper');
@@ -1331,15 +1290,14 @@
     });
 
     // --- Poster scaling ---
-     function scalePoster() {  
-  const wrapper = document.getElementById('posterWrapper');  
-  const available = Math.min(window.innerWidth - 48, 900);  
-  const scale = Math.min(available / 1080, 0.55);  
-  
-  wrapper.style.transform = `scale(${scale})`;  
-  wrapper.style.width = '1080px';  
-  wrapper.style.height = `${1350 * scale}px`;  
-}  
+    function scalePoster() {
+      const wrapper = document.getElementById('posterWrapper');
+      const available = Math.min(window.innerWidth - 48, 900);
+      const scale = Math.min(available / 1080, 0.55);
+      wrapper.style.transform = `scale(${scale})`;
+      wrapper.style.width = '1080px';
+      wrapper.style.height = `${1350 * scale}px`;
+    }
 
     window.addEventListener('resize', scalePoster);
     scalePoster();
