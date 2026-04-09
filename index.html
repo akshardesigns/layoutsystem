@@ -1093,98 +1093,120 @@
     });
 
     // Download PNG
-    document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('downloadPdfBtn');
-      const posterCanvas = document.getElementById('posterCanvas');
-      const posterWrapper = document.getElementById('posterWrapper');
-      
-      btn.disabled = true;
-      btn.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px;"></i> Processing...';
-      lucide.createIcons();
-      
-      try {
-        // Store original styles
-        const originalTransform = posterWrapper.style.transform;
-        const originalDisplay = posterCanvas.style.display;
-        const originalPosition = posterCanvas.style.position;
-        
-        // Create temporary container for accurate capture
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'fixed';
-        tempContainer.style.left = '-10000px';
-        tempContainer.style.top = '0';
-        tempContainer.style.width = '1080px';
-        tempContainer.style.backgroundColor = '#ffffff';
-        
-        // Clone the poster canvas
-        const clonedCanvas = posterCanvas.cloneNode(true);
-        clonedCanvas.style.transform = 'scale(1)';
-        clonedCanvas.style.margin = '0';
-        clonedCanvas.style.padding = '0';
-        
-        tempContainer.appendChild(clonedCanvas);
-        document.body.appendChild(tempContainer);
-        
-        // Wait for fonts
-        await document.fonts.ready;
-        
-        // Wait for all images in cloned element
-        const images = clonedCanvas.querySelectorAll('img');
-        await Promise.all([...images].map(img => {
-          if (img.complete) return Promise.resolve();
-          return new Promise(resolve => {
-            img.onload = img.onerror = resolve;
-          });
-        }));
-        
-        // Extra delay for rendering
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Capture at 2x scale for high quality
-        const canvas = await html2canvas(clonedCanvas, {
-          allowTaint: true,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-          scale: 2,
-          logging: false,
-          width: 1080,
-          height: 1350,
-          windowHeight: 1350,
-          imageTimeout: 10000,
-          removeContainer: false
-        });
-        
-        // Clean up temp container
-        document.body.removeChild(tempContainer);
-        
-        // Create PNG blob and download
-        canvas.toBlob((blob) => {
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `poster-layout-${currentLayout}.png`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-          
-          btn.disabled = false;
-          btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG';
-          lucide.createIcons();
-        }, 'image/png', 1.0);
-        
-      } catch (error) {
-        console.error('Download error:', error);
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Error';
-        lucide.createIcons();
-        
-        setTimeout(() => {
-          btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG';
-          lucide.createIcons();
-        }, 2000);
-      }
+document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('downloadPdfBtn');
+  const posterCanvas = document.getElementById('posterCanvas');
+
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px;"></i> Processing...';
+  lucide.createIcons();
+
+  try {
+
+    // 🔥 temp container (offscreen)
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'fixed';
+    tempContainer.style.left = '-10000px';
+    tempContainer.style.top = '0';
+    tempContainer.style.width = '1080px';
+    tempContainer.style.background = '#ffffff';
+
+    // 🔥 clone canvas
+    const clonedCanvas = posterCanvas.cloneNode(true);
+
+    // ===== FIX START =====
+
+    // reset transform biar gak ke-distort
+    clonedCanvas.style.transform = 'none';
+    clonedCanvas.style.margin = '0';
+    clonedCanvas.style.padding = '0';
+
+    // paksa background putih
+    clonedCanvas.style.background = '#ffffff';
+
+    // fix image biar gak stretch
+    clonedCanvas.querySelectorAll('img').forEach(img => {
+      img.style.objectFit = 'cover';
+      img.style.width = '100%';
+      img.style.height = '100%';
     });
+
+    // 🔥 replace mask-image (gradient) → overlay
+    clonedCanvas.querySelectorAll('.hero-image-area').forEach(el => {
+      const overlay = document.createElement('div');
+      overlay.style.position = 'absolute';
+      overlay.style.inset = '0';
+      overlay.style.background = 'linear-gradient(to bottom, transparent 0%, transparent 70%, #ffffff 100%)';
+      overlay.style.pointerEvents = 'none';
+      overlay.style.zIndex = '10';
+      el.appendChild(overlay);
+    });
+
+    // ===== FIX END =====
+
+    tempContainer.appendChild(clonedCanvas);
+    document.body.appendChild(tempContainer);
+
+    // tunggu font
+    await document.fonts.ready;
+
+    // tunggu semua gambar
+    const images = clonedCanvas.querySelectorAll('img');
+    await Promise.all([...images].map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise(resolve => {
+        img.onload = img.onerror = resolve;
+      });
+    }));
+
+    // delay biar render stabil
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // 🔥 capture
+    const canvas = await html2canvas(clonedCanvas, {
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      scale: 2,
+      width: 1080,
+      height: 1350,
+      windowWidth: 1080,
+      windowHeight: 1350,
+      scrollX: 0,
+      scrollY: 0
+    });
+
+    // cleanup
+    document.body.removeChild(tempContainer);
+
+    // download
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `poster-layout-${currentLayout}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG';
+      lucide.createIcons();
+    }, 'image/png', 1.0);
+
+  } catch (error) {
+    console.error('Download error:', error);
+
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Error';
+    lucide.createIcons();
+
+    setTimeout(() => {
+      btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG';
+      lucide.createIcons();
+    }, 2000);
+  }
+});
     
     // Touch swipe support on poster wrapper
     const posterWrapper = document.getElementById('posterWrapper');
