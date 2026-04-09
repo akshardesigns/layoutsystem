@@ -1306,14 +1306,29 @@
     });
 
     // --- Poster scaling ---
-    function scalePoster() {
-      const wrapper = document.getElementById('posterWrapper');
-      const available = Math.min(window.innerWidth - 48, 900);
-      const scale = Math.min(available / 1080, 0.55);
-      wrapper.style.transform = `scale(${scale})`;
-      wrapper.style.width = '1080px';
-      wrapper.style.height = `${1350 * scale}px`;
-    }
+    ffunction scalePoster() {
+  const wrapper = document.getElementById('posterWrapper');
+  const screenWidth = window.innerWidth;
+
+  let scale;
+
+  // 🔥 HP → full width (fix utama lo)
+  if (screenWidth < 480) {
+    scale = (screenWidth - 24) / 1080;
+  } 
+  // Tablet
+  else if (screenWidth < 900) {
+    scale = (screenWidth - 48) / 1080;
+  } 
+  // Desktop
+  else {
+    scale = 0.55;
+  }
+
+  wrapper.style.transform = `scale(${scale})`;
+  wrapper.style.width = '1080px';
+  wrapper.style.height = `${1350 * scale}px`;
+}
 
     window.addEventListener('resize', scalePoster);
     scalePoster();
