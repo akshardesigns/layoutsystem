@@ -1334,18 +1334,19 @@
     });
 
     // --- Poster scaling ---
-     function scalePoster() {  
+    function scalePoster() {  
   const wrapper = document.getElementById('posterWrapper');  
-  const container = wrapper.closest('.max-w-[900px]'); // 🔥 INI KUNCINYA
+  const container = wrapper.closest('.max-w-[900px]');
 
-  const availableWidth = container.offsetWidth;
+  const availableWidth = container.clientWidth;
   const scale = Math.min(availableWidth / 1080, 0.55);
 
   wrapper.style.transform = `scale(${scale})`;
   wrapper.style.transformOrigin = 'top center';
 
+  // 🔥 INI KUNCINYA
   wrapper.style.width = '1080px';
-  wrapper.style.height = `${1350 * scale}px`;
+  wrapper.style.height = '1350px'; // ❌ JANGAN dikali scale
 }
 
     window.addEventListener('resize', scalePoster);
