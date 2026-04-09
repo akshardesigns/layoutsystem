@@ -8,7 +8,6 @@
   <script src="/_sdk/element_sdk.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&amp;family=DM+Sans:wght@300;400;500;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
   <script>
@@ -965,7 +964,9 @@
       <p id="layoutIndicator" class="text-[12px] font-semibold text-neutral-900">Layout 1</p>
       <p class="text-[10px] text-neutral-400 font-mono">1 / 9</p>
      </div><button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></button>
-    </div><button id="downloadPdfBtn" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-2"><i data-lucide="download" style="width:14px;height:14px;"></i> Download PDF</button>
+    <button id="downloadBtn" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-xs font-semibold hover:bg-neutral-800 transition-colors flex items-center gap-2">
+  <i data-lucide="download" style="width:14px;height:14px;"></i> Download PNG
+</button>
    </div><!-- Live Preview -->
    <div class="py-10 flex justify-center">
     <div class="poster-wrapper" id="posterWrapper">
@@ -1110,89 +1111,71 @@
     });
 
     // Download PDF
-    document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('downloadPdfBtn');
-      const posterCanvas = document.getElementById('posterCanvas');
-      const posterWrapper = document.getElementById('posterWrapper');
-      
-      btn.disabled = true;
-      btn.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px;"></i> Processing...';
-      lucide.createIcons();
-      
-      try {
-        // Reset poster to 100% scale temporarily for accurate capture
-        const originalTransform = posterWrapper.style.transform;
-        posterWrapper.style.transform = 'scale(1)';
-        posterWrapper.style.width = '1080px';
-        posterWrapper.style.height = '1350px';
-        
-        // Wait for fonts
-        await document.fonts.ready;
-        
-        // Wait for all images
-        const images = posterCanvas.querySelectorAll('img');
-        await Promise.all([...images].map(img => {
-          if (img.complete) return Promise.resolve();
-          return new Promise(resolve => {
-            img.onload = img.onerror = resolve;
-          });
-        }));
-        
-        // Extra delay for rendering and layout recalculation
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Capture canvas at actual size
-        const canvas = await html2canvas(posterCanvas, {
-          allowTaint: true,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-          scale: 1,
-          logging: false,
-          width: 1080,
-          height: 1350,
-          windowHeight: 1350
-        });
-        
-        // Create PDF
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: [210, 262.5]
-        });
-        
-        const imgData = canvas.toDataURL('image/png');
-        pdf.addImage(imgData, 'PNG', 0, 0, 210, 262.5);
-        
-        // Open in new tab and user can save from there
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, '_blank');
-        
-        // Clean up
-        setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
-        
-        // Restore scale
-        posterWrapper.style.transform = originalTransform;
-        await new Promise(resolve => setTimeout(resolve, 100));
-        scalePoster();
-        
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PDF';
-        lucide.createIcons();
-        
-      } catch (error) {
-        console.error('Download error:', error);
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Error';
-        lucide.createIcons();
-        
-        setTimeout(() => {
-          btn.innerHTML = '<i data-lucide="download" style="width:14px;height:14px;"></i> Download PDF';
-          lucide.createIcons();
-        }, 2000);
-      }
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
+
+  const btn = document.getElementById('downloadBtn');
+  const posterCanvas = document.getElementById('posterCanvas');
+  const posterWrapper = document.getElementById('posterWrapper');
+
+  btn.disabled = true;
+  btn.innerHTML = 'Processing...';
+
+  try {
+
+    // 🔥 reset scale biar hasil 1:1
+    const originalTransform = posterWrapper.style.transform;
+    posterWrapper.style.transform = 'scale(1)';
+    posterWrapper.style.width = '1080px';
+    posterWrapper.style.height = '1350px';
+
+    // tunggu font
+    await document.fonts.ready;
+
+    // tunggu semua gambar
+    const images = posterCanvas.querySelectorAll('img');
+    await Promise.all([...images].map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise(resolve => {
+        img.onload = img.onerror = resolve;
+      });
+    }));
+
+    // kasih delay biar render stabil
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // 🔥 capture
+    const canvas = await html2canvas(posterCanvas, {
+      width: 1080,
+      height: 1350,
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: 1080,
+      windowHeight: 1350
     });
+
+    // 🔥 download PNG
+    const link = document.createElement('a');
+    link.download = 'poster.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    // balikin scale preview
+    posterWrapper.style.transform = originalTransform;
+    scalePoster();
+
+    btn.disabled = false;
+    btn.innerHTML = 'Download PNG';
+
+  } catch (error) {
+    console.error(error);
+    btn.innerHTML = 'Error';
+    btn.disabled = false;
+  }
+
+});
     
     // Touch swipe support on poster wrapper
     const posterWrapper = document.getElementById('posterWrapper');
