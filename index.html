@@ -24,18 +24,14 @@
     }
   </script>
   <style>
-   html, body { height: 100%; margin: 0; }  
-    .poster-canvas {  
-      width: 1080px;  
-      height: 1350px;  
-      position: relative;  
-      overflow: hidden; 
-   #posterWrapper {
-  margin: 0 auto;
+   html, body {
+  overflow-x: hidden;
 }
 
 .poster-wrapper {
-  overflow: visible !important;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
 }
     .poster-canvas {
       width: 1080px;
@@ -1009,11 +1005,13 @@
       </button>
     </div>
 
-    <!-- 🔥 PREVIEW (SUDAH PINDAH KE DALAM) -->
-    <div class="py-10 flex justify-center overflow">
-      <div class="poster-wrapper" id="posterWrapper">
-        <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
+   <!-- 🔥 PREVIEW -->
+<div class="py-6 px-4 flex justify-center w-full">
 
+  <div class="w-full max-w-[900px] flex justify-center">
+    
+    <div class="poster-wrapper" id="posterWrapper">
+      <div class="poster-canvas rounded-2xl shadow-2xl" id="posterCanvas" style="background:#FFFFFF;">
           <!-- Headline BG -->
           <div class="headline-bg" id="p_headline" style="color:#C8553D;">
             BEYOND THE EDGE
