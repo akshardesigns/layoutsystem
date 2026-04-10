@@ -909,6 +909,81 @@
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
     input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 6px; }
     body { box-sizing: border-box; }
+    .layout-slider-container {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding: 4px 0;
+    }
+    .layout-slider-container::-webkit-scrollbar {
+      height: 4px;
+    }
+    .layout-slider-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .layout-slider-container::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 2px;
+    }
+    .layout-slider-item {
+      flex-shrink: 0;
+      width: 120px;
+      height: 160px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .layout-slider-item:hover {
+      border-color: #9ca3af;
+    }
+    .layout-slider-item.active {
+      border-color: #1f2937;
+      box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+    }
+    .layout-slider-item-preview {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d1d5db;
+      background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+      font-weight: bold;
+      font-size: 11px;
+      text-align: center;
+      padding: 4px;
+      line-height: 1.2;
+      position: relative;
+    }
+    .layout-slider-item-preview svg {
+      width: 80%;
+      height: 80%;
+      opacity: 0.5;
+    }
+    .layout-slider-item-label {
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 9px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   </style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
@@ -952,14 +1027,19 @@
       </div><input type="file" id="file_logo" accept="image/*" class="hidden">
      </div>
     </div>
-   </div><!-- Layout Selector -->
-   <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-center bg-neutral-50">
-    <div class="flex items-center gap-3">
-     <button id="prevBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-left" style="width:16px;height:16px;"></i></button>
-     <div class="text-center min-w-20">
-      <p id="layoutIndicator" class="text-[12px] font-semibold text-neutral-900">Layout 1</p>
-      <p class="text-[10px] text-neutral-400 font-mono">1 / 9</p>
-     </div><button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors"><i data-lucide="chevron-right" style="width:16px;height:16px;"></i></button>
+   </div><!-- Layout Selector with Slider -->
+   <div class="px-6 py-6 border-b border-neutral-200 flex flex-col gap-4 bg-white">
+    <div class="flex items-center justify-between gap-2">
+     <button id="prevBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors flex-shrink-0"><i data-lucide="chevron-left" style="width:20px;height:20px;"></i></button>
+     <div class="flex-1 overflow-hidden">
+      <div class="layout-slider-container" id="layoutSlider"></div>
+     </div><button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors flex-shrink-0"><i data-lucide="chevron-right" style="width:20px;height:20px;"></i></button>
+    </div>
+    <div class="flex items-center justify-between gap-4">
+     <div class="flex-1 text-center">
+      <p id="layoutIndicator" class="text-sm font-display font-bold text-neutral-900">Layout 1</p>
+      <p class="text-xs text-neutral-400 font-mono mt-1 tracking-wider uppercase" id="layoutCounter">1 / 9</p>
+     </div><button id="downloadPngBtn" class="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-mono tracking-wider uppercase transition-colors flex items-center gap-2 flex-shrink-0"><i data-lucide="download" style="width:14px;height:14px;"></i> Export PNG</button>
     </div>
    </div><!-- Live Preview -->
    <div class="py-10 flex justify-center">
@@ -1034,6 +1114,108 @@
     let lastUploadedImage = null;
     let touchStartX = 0;
     
+    function generateLayoutSlider() {
+      const slider = document.getElementById('layoutSlider');
+      slider.innerHTML = '';
+      const layoutPreviews = [
+        // Layout 1: Full Width - centered text
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="20" x2="90" y2="20" stroke="#9ca3af" stroke-width="8"/>
+          <line x1="10" y1="35" x2="90" y2="35" stroke="#d1d5db" stroke-width="3"/>
+          <rect x="10" y="50" width="80" height="50" fill="#e5e7eb" rx="2"/>
+          <line x1="10" y1="110" x2="90" y2="110" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 2: 50-50 Split - text left, image right
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="10" x2="40" y2="10" stroke="#9ca3af" stroke-width="6"/>
+          <line x1="10" y1="25" x2="40" y2="25" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="35" x2="40" y2="35" stroke="#d1d5db" stroke-width="2"/>
+          <rect x="50" y="10" width="40" height="100" fill="#e5e7eb" rx="2"/>
+          <line x1="10" y1="130" x2="40" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 3: Image Top, Text Bottom - full width stacked
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <rect x="10" y="10" width="80" height="50" fill="#e5e7eb" rx="2"/>
+          <line x1="10" y1="70" x2="90" y2="70" stroke="#9ca3af" stroke-width="6"/>
+          <line x1="10" y1="82" x2="90" y2="82" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="90" x2="90" y2="90" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="130" x2="90" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 4: Diagonal - image left, text right
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <rect x="10" y="15" width="35" height="60" fill="#e5e7eb" rx="2"/>
+          <line x1="55" y1="20" x2="90" y2="20" stroke="#9ca3af" stroke-width="5"/>
+          <line x1="55" y1="32" x2="90" y2="32" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="55" y1="42" x2="90" y2="42" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="130" x2="90" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 5: Centered Image with text wrap
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="10" x2="90" y2="10" stroke="#9ca3af" stroke-width="2"/>
+          <circle cx="50" cy="40" r="18" fill="#e5e7eb"/>
+          <line x1="15" y1="65" x2="85" y2="65" stroke="#9ca3af" stroke-width="4"/>
+          <line x1="20" y1="78" x2="80" y2="78" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="20" y1="88" x2="80" y2="88" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="130" x2="90" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 6: Faded Sides - side images with center text
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <rect x="5" y="10" width="15" height="100" fill="#d1d5db" opacity="0.3" rx="1"/>
+          <rect x="80" y="10" width="15" height="100" fill="#d1d5db" opacity="0.3" rx="1"/>
+          <line x1="30" y1="30" x2="70" y2="30" stroke="#9ca3af" stroke-width="6"/>
+          <line x1="35" y1="45" x2="65" y2="45" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="35" y1="55" x2="65" y2="55" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="130" x2="90" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 7: Circular Images - circles with text
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <circle cx="75" cy="35" r="12" fill="#e5e7eb"/>
+          <line x1="10" y1="20" x2="55" y2="20" stroke="#9ca3af" stroke-width="5"/>
+          <line x1="10" y1="32" x2="55" y2="32" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="42" x2="55" y2="42" stroke="#d1d5db" stroke-width="2"/>
+          <circle cx="20" cy="95" r="18" fill="#e5e7eb"/>
+          <line x1="50" y1="100" x2="90" y2="100" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="50" y1="110" x2="90" y2="110" stroke="#d1d5db" stroke-width="2"/>
+        </svg>`,
+        // Layout 8: Right Image - text left, image right with color bar
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="15" x2="45" y2="15" stroke="#9ca3af" stroke-width="2"/>
+          <line x1="10" y1="25" x2="45" y2="25" stroke="#9ca3af" stroke-width="5"/>
+          <line x1="10" y1="38" x2="45" y2="38" stroke="#d1d5db" stroke-width="2"/>
+          <rect x="50" y="15" width="40" height="40" fill="#e5e7eb" rx="1"/>
+          <line x1="10" y1="48" x2="45" y2="48" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="56" x2="45" y2="56" stroke="#d1d5db" stroke-width="2"/>
+          <rect x="90" y="0" width="10" height="140" fill="#9ca3af"/>
+        </svg>`,
+        // Layout 9: Image Bottom - text top, image bottom faded
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="15" x2="90" y2="15" stroke="#9ca3af" stroke-width="6"/>
+          <line x1="10" y1="27" x2="90" y2="27" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="37" x2="90" y2="37" stroke="#d1d5db" stroke-width="2"/>
+          <rect x="10" y="50" width="80" height="60" fill="#e5e7eb" opacity="0.4" rx="2"/>
+        </svg>`
+      ];
+      
+      for (let i = 1; i <= 9; i++) {
+        const slide = document.createElement('div');
+        slide.className = `layout-slider-item ${i === 1 ? 'active' : ''}`;
+        slide.dataset.layout = i;
+        const labels = ['Full Width', '50-50 Split', 'Image Top', 'Diagonal', 'Centered', 'Faded Sides', 'Circles', 'Right Image', 'Image Bottom'];
+        slide.innerHTML = `<div class="layout-slider-item-preview">${layoutPreviews[i-1]}</div><div class="layout-slider-item-label">${labels[i-1]}</div>`;
+        slide.addEventListener('click', () => updateLayout(i));
+        slider.appendChild(slide);
+      }
+    }
+
     function updateLayout(layoutNum) {
       currentLayout = layoutNum;
       const canvas = document.getElementById('posterCanvas');
@@ -1042,6 +1224,18 @@
       
       // Update indicator
       document.getElementById('layoutIndicator').textContent = `Layout ${layoutNum}`;
+      document.getElementById('layoutCounter').textContent = `${layoutNum} / 9`;
+      
+      // Update slider active state
+      document.querySelectorAll('.layout-slider-item').forEach(item => {
+        item.classList.toggle('active', parseInt(item.dataset.layout) === layoutNum);
+      });
+      
+      // Scroll slider to center active item
+      const activeSlide = document.querySelector(`.layout-slider-item[data-layout="${layoutNum}"]`);
+      if (activeSlide) {
+        activeSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
       
       // Remove all layout classes
       canvas.classList.remove('layout-1', 'layout-2', 'layout-3', 'layout-4', 'layout-5', 'layout-6', 'layout-7', 'layout-8', 'layout-9');
@@ -1213,600 +1407,8 @@
     window.addEventListener('resize', scalePoster);
     scalePoster();
 
-    // --- Canvas Export System (Pixel-Perfect) ---
-    const CANVAS_W = 1080;
-    const CANVAS_H = 1350;
-
-    function loadImagePromise(src) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = src;
-      });
-    }
-
-    function wrapText(ctx, text, x, y, maxWidth, lineHeight, align = 'left') {
-      const words = text.split(' ');
-      let line = '';
-      const lines = [];
-      
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line + words[i] + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && line !== '') {
-          lines.push(line.trim());
-          line = words[i] + ' ';
-        } else {
-          line = testLine;
-        }
-      }
-      if (line) lines.push(line.trim());
-      
-      let offsetY = y;
-      lines.forEach(l => {
-        ctx.textAlign = align;
-        if (align === 'center') {
-          ctx.fillText(l, x, offsetY);
-        } else if (align === 'right') {
-          ctx.fillText(l, x, offsetY);
-        } else {
-          ctx.fillText(l, x, offsetY);
-        }
-        offsetY += lineHeight;
-      });
-      
-      return offsetY - y;
-    }
-
-    function drawImage(ctx, img, x, y, w, h, radius = 0, opacity = 1) {
-      if (!img) return;
-      
-      ctx.save();
-      ctx.globalAlpha = opacity;
-      
-      if (radius > 0) {
-        ctx.beginPath();
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + w - radius, y);
-        ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
-        ctx.lineTo(x + w, y + h - radius);
-        ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-        ctx.lineTo(x + radius, y + h);
-        ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-        ctx.closePath();
-        ctx.clip();
-      }
-      
-      ctx.drawImage(img, x, y, w, h);
-      ctx.restore();
-    }
-
-    function drawImageCover(ctx, img, x, y, w, h) {
-      if (!img) return;
-
-      const imgRatio = img.width / img.height;
-      const boxRatio = w / h;
-
-      let drawWidth, drawHeight, offsetX, offsetY;
-
-      if (imgRatio > boxRatio) {
-        drawHeight = h;
-        drawWidth = img.width * (h / img.height);
-        offsetX = (w - drawWidth) / 2;
-        offsetY = 0;
-      } else {
-        drawWidth = w;
-        drawHeight = img.height * (w / img.width);
-        offsetX = 0;
-        offsetY = (h - drawHeight) / 2;
-      }
-
-      ctx.drawImage(img, x + offsetX, y + offsetY, drawWidth, drawHeight);
-    }
-
-    function drawImageWithFadeMask(ctx, img, x, y, w, h, maskDir = 'bottom') {
-      if (!img) return;
-      
-      ctx.save();
-      
-      // Draw image with clipping
-      ctx.beginPath();
-      ctx.rect(x, y, w, h);
-      ctx.clip();
-      ctx.drawImage(img, x, y, w, h);
-      
-      // Apply fade gradient
-      const grad = ctx.createLinearGradient(
-        x, maskDir === 'bottom' ? y : y + h,
-        x, maskDir === 'bottom' ? y + h : y
-      );
-      grad.addColorStop(0, 'rgba(255,255,255,0)');
-      grad.addColorStop(0.6, 'rgba(255,255,255,0)');
-      grad.addColorStop(1, 'rgba(255,255,255,1)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(x, y, w, h);
-      
-      ctx.restore();
-    }
-
-    async function drawLayout1(ctx, data) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-      
-      // Headline
-      ctx.font = "bold 140px 'Playfair Display', serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 50, 1000, 140 * 0.92, 'center');
-      
-      // Sub Headline
-      ctx.font = "bold 26px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 380, 1000, 26 * 0.92, 'center');
-      
-      // Hero Image with fade
-      if (data.heroImg) {
-        drawImageWithFadeMask(ctx, data.heroImg, 40, 490, 1000, 540, 'bottom');
-      }
-      
-      // Tagline
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      ctx.fillText(data.tagline, 40, 1300);
-      
-      // Info
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      ctx.fillText(data.info, CANVAS_W / 2, 1125);
-      
-      // Info bar lines
-      ctx.strokeStyle = '#e5e7eb';
-      ctx.lineWidth = 1;
-      
-      ctx.beginPath();
-      ctx.moveTo(40, 1125);
-      ctx.lineTo(300, 1125);
-      ctx.stroke();
-      
-      ctx.beginPath();
-      ctx.moveTo(780, 1125);
-      ctx.lineTo(1040, 1125);
-      ctx.stroke();
-      
-      // Description (two columns with wrapping)
-      ctx.font = "300 16px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#374151';
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.desc1, 40, 1175, 480, 22, 'left');
-      ctx.textAlign = 'right';
-      wrapText(ctx, data.desc2, 1040, 1175, 480, 22, 'right');
-      
-      // Logo
-      if (data.logo) {
-        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
-      }
-    }
-
-    async function drawLayout2(ctx, data) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-      
-      // Hero Image (Right side)
-      if (data.heroImg) {
-        drawImageCover(ctx, data.heroImg, 540, 40, 500, 1270);
-      }
-      
-      // Headline (Left side)
-      ctx.font = "bold 88px 'Playfair Display', serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.headline, 40, 760, 500, 88 * 0.92, 'left');
-      
-      // Sub Headline
-      ctx.font = "bold 20px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.sub, 40, 960, 480, 20 * 0.92, 'left');
-      
-      // Description stacked
-      ctx.font = "300 14px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#374151';
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.desc1, 40, 1030, 480, 20, 'left');
-      wrapText(ctx, data.desc2, 40, 1090, 480, 20, 'left');
-      
-      // Tagline
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      ctx.fillText(data.tagline, 40, 70);
-      
-      // Info (bottom right)
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'right';
-      ctx.fillText(data.info, CANVAS_W - 40, 1300);
-      
-      // Logo
-      if (data.logo) {
-        drawImageCover(ctx, data.logo, 40, 1250, 60, 60);
-      }
-    }
-
-    async function drawLayout3(ctx, data) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-      
-      // Hero Image (top full width)
-      if (data.heroImg) {
-        drawImageCover(ctx, data.heroImg, 40, 20, 1000, 600);
-      }
-      
-      // Info
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      ctx.fillText(data.info, CANVAS_W / 2, 650);
-      
-      // Headline
-      ctx.font = "bold 120px 'Playfair Display', serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 700, 1000, 120 * 0.92, 'center');
-      
-      // Sub
-      ctx.font = "bold 20px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 970, 1000, 20 * 0.92, 'center');
-      
-      // Tagline
-      ctx.font = "11px 'Space Mono', monospace";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      ctx.fillText(data.tagline, 40, 1300);
-      
-      // Logo
-      if (data.logo) {
-        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
-      }
-    }
-
-    async function drawLayout4(ctx, data) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-      
-      // Hero Image (left)
-      if (data.heroImg) {
-        drawImageCover(ctx, data.heroImg, 40, 40, 450, 800);
-      }
-      
-      // Headline
-      ctx.font = "bold 96px 'Playfair Display', serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.headline, 595, 400, 445, 96 * 0.92, 'left');
-      
-      // Sub
-      ctx.font = "bold 18px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.sub, 595, 700, 445, 18 * 0.92, 'left');
-      
-      // Tagline
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      ctx.fillText(data.tagline, 595, 70);
-      
-      // Description
-      ctx.font = "300 13px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#374151';
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.desc1, 595, 800, 445, 18, 'left');
-      
-      // Logo
-      if (data.logo) {
-        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
-      }
-    }
-
-    async function drawLayout5(ctx, data) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-      
-      // Hero Image (centered)
-      if (data.heroImg) {
-        drawImageCover(ctx, data.heroImg, 240, 50, 600, 500);
-      }
-      
-      // Tagline
-      ctx.font = "11px 'Space Mono', monospace";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'center';
-      ctx.fillText(data.tagline, CANVAS_W / 2, 30);
-      
-      // Info
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      ctx.fillText(data.info, CANVAS_W / 2, 550);
-      
-      // Headline
-      ctx.font = "bold 110px 'Playfair Display', serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 590, 1000, 110 * 0.92, 'center');
-      
-      // Sub
-      ctx.font = "bold 19px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 827, 1000, 19 * 0.92, 'center');
-      
-      // Description
-      ctx.font = "300 20px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#4b5563';
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.desc1, CANVAS_W / 2, 888, 600, 28, 'center');
-      
-      // Logo
-      if (data.logo) {
-        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
-      }
-    }
-
-    async function drawLayout6(ctx, data) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-      
-      // Side images (faded with mask gradient)
-      if (data.heroImg) {
-        ctx.save();
-        ctx.globalAlpha = 0.35;
-        
-        // Left image with right fade
-        ctx.beginPath();
-        ctx.rect(40, 40, 300, 1270);
-        ctx.clip();
-        ctx.drawImage(data.heroImg, 40, 40, 300, 1270);
-        
-        const leftGrad = ctx.createLinearGradient(40, 0, 340, 0);
-        leftGrad.addColorStop(0, 'rgba(255,255,255,0)');
-        leftGrad.addColorStop(0.3, 'rgba(255,255,255,0)');
-        leftGrad.addColorStop(1, 'rgba(255,255,255,1)');
-        ctx.fillStyle = leftGrad;
-        ctx.fillRect(40, 40, 300, 1270);
-        ctx.restore();
-        
-        // Right image with left fade
-        ctx.save();
-        ctx.globalAlpha = 0.35;
-        ctx.beginPath();
-        ctx.rect(740, 40, 300, 1270);
-        ctx.clip();
-        ctx.drawImage(data.heroImg, 740, 40, 300, 1270);
-        
-        const rightGrad = ctx.createLinearGradient(740, 0, 1040, 0);
-        rightGrad.addColorStop(0, 'rgba(255,255,255,1)');
-        rightGrad.addColorStop(0.7, 'rgba(255,255,255,0)');
-        rightGrad.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = rightGrad;
-        ctx.fillRect(740, 40, 300, 1270);
-        ctx.restore();
-      }
-      
-      // Tagline
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'center';
-      ctx.fillText(data.tagline, CANVAS_W / 2, 80);
-      
-      // Sub
-      ctx.font = "bold 20px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 400, 600, 20 * 0.92, 'center');
-      
-      // Headline
-      ctx.font = "bold 140px 'Playfair Display', serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 440, 600, 140 * 0.92, 'center');
-      
-      // Info
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      ctx.fillText(data.info, CANVAS_W / 2, 880);
-      
-      // Description
-      ctx.font = "300 14px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#374151';
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.desc1, CANVAS_W / 2, 950, 600, 20, 'center');
-      
-      // Logo
-      if (data.logo) {
-        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
-      }
-    }
-
-    async function drawLayout7(ctx, data) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-      
-      // Circular images
-      if (data.heroImg) {
-        // Left circle (bottom)
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(40 + 190, CANVAS_H - 150 - 190, 190, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(data.heroImg, 40, CANVAS_H - 150 - 380, 380, 380);
-        ctx.restore();
-        
-        // Right circle
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(CANVAS_W - 40 - 140, 420 + 140, 140, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(data.heroImg, CANVAS_W - 40 - 280, 420, 280, 280);
-        ctx.restore();
-      }
-      
-      // Tagline
-      ctx.font = "13px 'Space Mono', monospace";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      ctx.fillText(data.tagline, 40, 60);
-      
-      // Top right line
-      ctx.strokeStyle = '#374151';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(CANVAS_W - 40 - 120, 60);
-      ctx.lineTo(CANVAS_W - 40, 60);
-      ctx.stroke();
-      
-      // Headline
-      ctx.font = "bold 160px 'Playfair Display', serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.headline, 40, 80, 500, 160 * 0.92, 'left');
-      
-      // Sub
-      ctx.font = "bold 28px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.sub, 40, 645, 500, 28 * 0.92, 'left');
-      
-      // Info
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'left';
-      ctx.fillText(data.info, 40, 1300);
-      
-      // Description (right side)
-      ctx.font = "300 22px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#4b5563';
-      ctx.textAlign = 'right';
-      wrapText(ctx, data.desc1, CANVAS_W - 40, 120, 420, 28, 'right');
-      
-      // Logo
-      if (data.logo) {
-        drawImageCover(ctx, data.logo, 980, 1250, 60, 60);
-      }
-    }
-
-    async function drawLayout8(ctx, data) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-      
-      // Hero Image
-      if (data.heroImg) {
-        drawImageCover(ctx, data.heroImg, 340, 150, 744, 432);
-      }
-      
-      // Tagline
-      ctx.font = "33px 'DM Sans', sans-serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      ctx.fillText(data.tagline, 40, 100);
-      
-      // Headline
-      ctx.font = "bold 149px 'Playfair Display', serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.headline, 100, 567, 780, 149 * 0.92, 'left');
-      
-      // Sub
-      ctx.font = "500 26px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'left';
-      wrapText(ctx, data.sub, 100, 1029, 600, 32, 'left');
-      
-      // Info
-      ctx.font = "500 21px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'left';
-      ctx.fillText(data.info, 100, 1180);
-      
-      // Description
-      ctx.font = "300 13px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#374151';
-      ctx.textAlign = 'right';
-      wrapText(ctx, data.desc1, CANVAS_W - 40, CANVAS_H - 200, 200, 18, 'right');
-      
-      // Anchor line (bottom color)
-      ctx.fillStyle = data.color;
-      ctx.fillRect(100, 1230, 680, 10);
-      
-      // Logo
-      if (data.logo) {
-        drawImageCover(ctx, data.logo, 40, 1250, 60, 60);
-      }
-    }
-
-    async function drawLayout9(ctx, data) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-      
-      // Tagline
-      ctx.font = "11px 'Space Mono', monospace";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'left';
-      ctx.fillText(data.tagline, 40, 50);
-      
-      // Info
-      ctx.font = "12px 'Space Mono', monospace";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      ctx.fillText(data.info, CANVAS_W / 2, 145);
-      
-      // Headline
-      ctx.font = "bold 99px 'Playfair Display', serif";
-      ctx.fillStyle = data.color;
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.headline, CANVAS_W / 2, 167, 500, 99 * 0.92, 'center');
-      
-      // Sub
-      ctx.font = "bold 19px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#1f2937';
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.sub, CANVAS_W / 2, 386, 1000, 19 * 0.92, 'center');
-      
-      // Description
-      ctx.font = "300 14px 'DM Sans', sans-serif";
-      ctx.fillStyle = '#374151';
-      ctx.textAlign = 'center';
-      wrapText(ctx, data.desc1, CANVAS_W / 2, 470, 600, 18, 'center');
-      
-      // Hero Image (bottom with fade)
-      if (data.heroImg) {
-        drawImageWithFadeMask(ctx, data.heroImg, 0, CANVAS_H - 900, CANVAS_W, 900, 'top');
-      }
-      
-      // Logo
-      if (data.logo) {
-        drawImageCover(ctx, data.logo, 980, 50, 60, 60);
-      }
-    }
-
-    async function exportAsCanvas() {
-      const canvas = document.createElement('canvas');
-      canvas.width = CANVAS_W;
-      canvas.height = CANVAS_H;
-      const ctx = canvas.getContext('2d');
-      
-      // Gather data
+    // Export PNG handler
+    document.getElementById('downloadPngBtn').addEventListener('click', () => {
       const data = {
         headline: document.getElementById('p_headline').textContent,
         sub: document.getElementById('p_sub').textContent,
@@ -1815,51 +1417,18 @@
         info: document.getElementById('p_info').textContent,
         tagline: document.getElementById('p_tagline').textContent,
         color: document.getElementById('inp_color').value,
-        heroImg: null,
-        sideImgLeft: null,
-        sideImgRight: null,
-        logo: null
+        layout: currentLayout,
+        image: document.querySelector('#p_hero img')?.src || null,
+        logo: document.querySelector('#p_brand img')?.src || null
       };
-      
-      // Load images
-      const heroEl = document.querySelector('#p_hero img');
-      if (heroEl && heroEl.src) {
-        data.heroImg = await loadImagePromise(heroEl.src);
-      }
-      
-      const sideLeft = document.getElementById('p_side_image_left');
-      if (sideLeft && sideLeft.src && sideLeft.style.display !== 'none') {
-        data.sideImgLeft = await loadImagePromise(sideLeft.src);
-      }
-      
-      const sideRight = document.getElementById('p_side_image_right');
-      if (sideRight && sideRight.src && sideRight.style.display !== 'none') {
-        data.sideImgRight = await loadImagePromise(sideRight.src);
-      }
-      
-      const logoEl = document.querySelector('#p_brand img');
-      if (logoEl && logoEl.src) {
-        data.logo = await loadImagePromise(logoEl.src);
-      }
-      
-      // Draw layout
-      const layoutFunctions = [
-        drawLayout1, drawLayout2, drawLayout3, drawLayout4, drawLayout5,
-        drawLayout6, drawLayout7, drawLayout8, drawLayout9
-      ];
-      
-      if (currentLayout >= 1 && currentLayout <= 9) {
-        await layoutFunctions[currentLayout - 1](ctx, data);
-      }
-      
-      return canvas;
-    }
-
-    // Download handler removed
+      const encoded = encodeURIComponent(JSON.stringify(data));
+      window.open(`./export.html?data=${encoded}`, '_blank');
+    });
 
 
-    // Init icons
+    // Init
+    generateLayoutSlider();
     lucide.createIcons();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9b5618301e8936',t:'MTc3NTc1Njg0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9dcd027023eba1',t:'MTc3NTc4MjY4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
