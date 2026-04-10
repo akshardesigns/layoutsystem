@@ -985,6 +985,28 @@
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
+   /* EXPORT FIXES */
+#posterCanvas {
+  contain: layout style paint;
+  will-change: transform;
+}
+
+#posterCanvas * {
+  will-change: auto;
+}
+
+/* Force consistent rendering */
+#posterCanvas,
+#posterCanvas * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+}
+
+/* Prevent text reflow during capture */
+.poster-canvas .headline-bg {
+  contain: strict;
+}
   </style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
@@ -1271,21 +1293,29 @@
         }
       }
       
-      // If layout 6 and visual already uploaded, show left and right images
-      if (layoutNum === 6 && lastUploadedImage) {
-        document.getElementById('p_side_image_left').src = lastUploadedImage;
-        document.getElementById('p_side_image_left').style.display = 'block';
-        document.getElementById('p_side_image_right').src = lastUploadedImage;
-        document.getElementById('p_side_image_right').style.display = 'block';
-      }
-      
-      // If layout 7 and visual already uploaded, show left and right images
-      if (layoutNum === 7 && lastUploadedImage) {
-        document.getElementById('p_side_image_left').src = lastUploadedImage;
-        document.getElementById('p_side_image_left').style.display = 'block';
-        document.getElementById('p_side_image_right').src = lastUploadedImage;
-        document.getElementById('p_side_image_right').style.display = 'block';
-      }
+// *** TAMBahkan INI SATU HURUF PUN JANGAN DIHAPUS ***
+if ((layoutNum === 6 || layoutNum === 7) && lastUploadedImage) {
+  const leftImg = document.getElementById('p_side_image_left');
+  const rightImg = document.getElementById('p_side_image_right');
+  
+  leftImg.src = lastUploadedImage;
+  rightImg.src = lastUploadedImage;
+  leftImg.style.display = 'block';
+  rightImg.style.display = 'block';
+  
+  // FORCE RELOAD untuk konsistensi export PNG
+  const forceReload = (img) => {
+    const src = img.src;
+    img.src = '';
+    img.src = src;
+  };
+  
+  leftImg.onload = () => { leftImg.style.opacity = '1'; };
+  rightImg.onload = () => { rightImg.style.opacity = '1'; };
+  
+  forceReload(leftImg);
+  forceReload(rightImg);
+}
     }
     
     document.getElementById('nextBtn').addEventListener('click', () => {
@@ -1395,76 +1425,105 @@
       brand.innerHTML = `<img src="${dataUrl}" style="height:36px;width:auto;">`;
     });
 
-    // --- Poster scaling ---
-    function scalePoster() {
-      const wrapper = document.getElementById('posterWrapper');
-      const available = Math.min(window.innerWidth - 48, 900);
-      const scale = Math.min(available / 1080, 0.55);
-      wrapper.style.transform = `scale(${scale})`;
-      wrapper.style.width = '1080px';
-      wrapper.style.height = `${1350 * scale}px`;
-    }
+   
+    // Poster scaling - UPDATED
+function scalePoster() {
+  const wrapper = document.getElementById('posterWrapper');
+  const availableWidth = window.innerWidth - 48;
+  const scale = Math.min(availableWidth / 1080, 0.55);
+  
+  wrapper.style.transformOrigin = 'top center';
+  wrapper.style.transform = `scale(${scale})`;
+  wrapper.style.width = `${1080 * scale}px`;
+  wrapper.style.height = `${1350 * scale}px`;
+}
 
     window.addEventListener('resize', scalePoster);
     scalePoster();
 
     // Export PNG handler
-    document.getElementById('downloadPngBtn').onclick = async function () {
+    // Export PNG handler - VERSI PERBAIKAN
+document.getElementById('downloadPngBtn').onclick = async function () {
   const original = document.getElementById('posterCanvas');
-
-  // 1️⃣ clone element (bawa semua layout + class)
-  const clone = original.cloneNode(true);
-
-  // 2️⃣ paksa ukuran asli (bukan hasil scale preview)
-  clone.style.width = '1080px';
-  clone.style.height = '1350px';
-  clone.style.transform = 'none';
-  clone.style.position = 'fixed';
-  clone.style.top = '0';
-  clone.style.left = '0';
-  clone.style.margin = '0';
-  clone.style.zIndex = '9999';
-  clone.style.background = '#ffffff';
-
-  document.body.appendChild(clone);
-
-  // 3️⃣ FIX IMAGE (biar sama kayak preview)
-  clone.querySelectorAll('img').forEach(img => {
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-  });
-
-  // 4️⃣ FIX FONT (WAJIB)
-  if (document.fonts && document.fonts.ready) {
+  const wrapper = document.getElementById('posterWrapper');
+  
+  // 1️⃣ SIMPAN STATE ASLI
+  const originalScale = wrapper.style.transform;
+  const originalWidth = wrapper.style.width;
+  const originalHeight = wrapper.style.height;
+  
+  // 2️⃣ RESET KE UKURAN FULL (1080x1350px) UNTUK EXPORT
+  wrapper.style.transform = 'scale(1)';
+  wrapper.style.width = '1080px';
+  wrapper.style.height = '1350px';
+  
+  // 3️⃣ FORCE LAYOUT REFLOW
+  wrapper.offsetHeight; // Trigger reflow
+  
+  // 4️⃣ TUNGGU FONTS READY
+  if (document.fonts) {
     await document.fonts.ready;
   }
-
-  // 5️⃣ FORCE LAYOUT STABLE (INI KUNCI)
+  
+  // 5️⃣ EXTRA WAIT UNTUK LAYOUT STABIL
+  await new Promise(resolve => setTimeout(resolve, 100));
   await new Promise(r => requestAnimationFrame(r));
   await new Promise(r => requestAnimationFrame(r));
-
-  // 6️⃣ CAPTURE
+  
   try {
-    const canvas = await html2canvas(clone, {
-      scale: 2,
+    // 6️⃣ CAPTURE DENGAN SETTING OPTIMAL
+    const canvas = await html2canvas(original, {
+      scale: 3, // Higher DPI untuk kualitas print
       useCORS: true,
-      backgroundColor: null,
-      logging: false
+      backgroundColor: '#ffffff',
+      width: 1080,
+      height: 1350,
+      logging: false,
+      // CRUCIAL: Force exact dimensions
+      onclone: (clonedDoc, element) => {
+        const clonedCanvas = clonedDoc.getElementById('posterCanvas');
+        clonedCanvas.style.width = '1080px';
+        clonedCanvas.style.height = '1350px';
+        clonedCanvas.style.transform = 'none';
+        clonedCanvas.style.position = 'relative';
+        
+        // FIX IMAGES
+        clonedDoc.querySelectorAll('#posterCanvas img').forEach(img => {
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+          img.style.display = 'block';
+        });
+        
+        // FIX TEXT OVERFLOW
+        clonedDoc.querySelectorAll('#posterCanvas .headline-bg').forEach(el => {
+          el.style.wordBreak = 'break-word';
+          el.style.whiteSpace = 'normal';
+          el.style.overflow = 'visible';
+        });
+      }
     });
 
     // 7️⃣ DOWNLOAD
-    const link = document.createElement('a');
-    link.download = 'poster.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `poster-layout-${currentLayout}.png`;
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 'image/png', 1.0);
 
   } catch (err) {
     console.error('EXPORT ERROR:', err);
+  } finally {
+    // 8️⃣ RESTORE SCALE ASLI
+    wrapper.style.transform = originalScale;
+    wrapper.style.width = originalWidth;
+    wrapper.style.height = originalHeight;
   }
-
-  // 8️⃣ CLEANUP
-  document.body.removeChild(clone);
 };
 
     // Init
