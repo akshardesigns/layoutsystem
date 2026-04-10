@@ -1410,78 +1410,24 @@
 
     // Export PNG handler
     document.getElementById('downloadPngBtn').onclick = async function () {
-  const original = document.getElementById('posterCanvas');
   const wrapper = document.getElementById('posterWrapper');
+  const canvasEl = document.getElementById('posterCanvas');
 
-  // 🔥 SIMPAN SCALE PREVIEW
+  // 🔥 simpan scale
   const prevTransform = wrapper.style.transform;
 
-  // 🔥 MATIKAN SCALE BIAR STABIL
+  // 🔥 matikan scale
   wrapper.style.transform = 'none';
 
-  // 1️⃣ CLONE
-  const clone = original.cloneNode(true);
-
-  clone.style.width = '1080px';
-  clone.style.height = '1350px';
-  clone.style.position = 'fixed';
-  clone.style.top = '0';
-  clone.style.left = '0';
-  clone.style.margin = '0';
-  clone.style.zIndex = '9999';
-  clone.style.background = '#ffffff';
-  clone.style.transform = 'none';
-
-  document.body.appendChild(clone);
-
-  // 2️⃣ GRADIENT FIX (MENIRU MASK-IMAGE)
-  clone.querySelectorAll('.hero-image-area').forEach(hero => {
-    const gradient = document.createElement('div');
-
-    gradient.style.position = 'absolute';
-    gradient.style.inset = '0';
-    gradient.style.pointerEvents = 'none';
-    gradient.style.zIndex = '2';
-
-    gradient.style.borderRadius = getComputedStyle(hero).borderRadius;
-
-    gradient.style.background = `
-      linear-gradient(
-        to bottom,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0) 65%,
-        rgba(255,255,255,0.8) 85%,
-        rgba(255,255,255,1) 100%
-      )
-    `;
-
-    hero.style.position = 'relative';
-    hero.appendChild(gradient);
-  });
-
-  // 3️⃣ FIX IMAGE
-  clone.querySelectorAll('img').forEach(img => {
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-  });
-
-  // 4️⃣ WAIT FONT
-  if (document.fonts && document.fonts.ready) {
-    await document.fonts.ready;
-  }
-
-  // 5️⃣ STABILIZE LAYOUT
+  // 🔥 tunggu layout stabil
   await new Promise(r => requestAnimationFrame(r));
   await new Promise(r => requestAnimationFrame(r));
 
-  // 6️⃣ CAPTURE
   try {
-    const canvas = await html2canvas(clone, {
+    const canvas = await html2canvas(canvasEl, {
       scale: 2,
       useCORS: true,
-      backgroundColor: '#ffffff',
-      logging: false
+      backgroundColor: '#ffffff'
     });
 
     const link = document.createElement('a');
@@ -1493,10 +1439,7 @@
     console.error('EXPORT ERROR:', err);
   }
 
-  // 7️⃣ CLEANUP
-  document.body.removeChild(clone);
-
-  // 🔥 BALIKIN SCALE
+  // 🔥 balikin scale
   wrapper.style.transform = prevTransform;
 };
 
