@@ -1412,48 +1412,58 @@
     document.getElementById('downloadPngBtn').onclick = async function () {
   const original = document.getElementById('posterCanvas');
 
-  // 1️⃣ CLONE
+  // 1️⃣ clone element (bawa semua layout + class)
   const clone = original.cloneNode(true);
 
-  // 2️⃣ FIX SIZE & POSISI
-  clone.style.transform = 'none';
+  // 2️⃣ paksa ukuran asli (bukan hasil scale preview)
   clone.style.width = '1080px';
   clone.style.height = '1350px';
+  clone.style.transform = 'none';
   clone.style.position = 'fixed';
-  clone.style.top = '-9999px';
+  clone.style.top = '0';
   clone.style.left = '0';
-  clone.style.zIndex = '-1';
+  clone.style.margin = '0';
+  clone.style.zIndex = '9999';
+  clone.style.background = '#ffffff';
 
-  // 3️⃣ MASUKIN KE DOM (INI PENTING)
   document.body.appendChild(clone);
 
-  // 4️⃣ 🔥 TARUH KODE LO DI SINI
-  const imgs = clone.querySelectorAll('img');
-
-  imgs.forEach(img => {
-    img.style.objectFit = 'cover';
+  // 3️⃣ FIX IMAGE (biar sama kayak preview)
+  clone.querySelectorAll('img').forEach(img => {
     img.style.width = '100%';
     img.style.height = '100%';
+    img.style.objectFit = 'cover';
   });
 
-  // 5️⃣ BARU CAPTURE
+  // 4️⃣ FIX FONT (WAJIB)
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready;
+  }
+
+  // 5️⃣ FORCE LAYOUT STABLE (INI KUNCI)
+  await new Promise(r => requestAnimationFrame(r));
+  await new Promise(r => requestAnimationFrame(r));
+
+  // 6️⃣ CAPTURE
   try {
     const canvas = await html2canvas(clone, {
       scale: 2,
       useCORS: true,
-      backgroundColor: '#ffffff'
+      backgroundColor: null,
+      logging: false
     });
 
+    // 7️⃣ DOWNLOAD
     const link = document.createElement('a');
     link.download = 'poster.png';
-    link.href = canvas.toDataURL();
+    link.href = canvas.toDataURL('image/png');
     link.click();
 
   } catch (err) {
-    console.error(err);
+    console.error('EXPORT ERROR:', err);
   }
 
-  // 6️⃣ HAPUS CLONE
+  // 8️⃣ CLEANUP
   document.body.removeChild(clone);
 };
 
