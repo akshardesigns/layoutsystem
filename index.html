@@ -1409,40 +1409,35 @@
     scalePoster();
 
     // Export PNG handler
-    document.getElementById('downloadPngBtn').addEventListener('click', async () => {
-  const el = document.getElementById('posterCanvas');
+    document.getElementById('downloadPngBtn').onclick = async function () {
+  const wrapper = document.getElementById('posterWrapper');
+  const canvasEl = document.getElementById('posterCanvas');
 
-  // simpan kondisi preview
-  const originalTransform = el.style.transform;
-  const originalWidth = el.style.width;
-  const originalHeight = el.style.height;
+  // 🔥 SIMPAN SCALE
+  const wrapperTransform = wrapper.style.transform;
 
-  // reset ke ukuran asli (WAJIB)
-  el.style.transform = 'none';
-  el.style.width = '1080px';
-  el.style.height = '1350px';
+  // 🔥 MATIKAN SCALE
+  wrapper.style.transform = 'none';
 
   try {
-    const canvas = await html2canvas(el, {
-      scale: 3,
+    const canvas = await html2canvas(canvasEl, {
+      scale: 2,
       useCORS: true,
       backgroundColor: '#ffffff'
     });
 
     const link = document.createElement('a');
-    link.download = `poster-layout-${currentLayout}.png`;
-    link.href = canvas.toDataURL('image/png');
+    link.download = 'poster.png';
+    link.href = canvas.toDataURL();
     link.click();
 
   } catch (err) {
     console.error(err);
   }
 
-  // balikin ke preview
-  el.style.transform = originalTransform;
-  el.style.width = originalWidth;
-  el.style.height = originalHeight;
-});
+  // 🔥 BALIKIN SCALE
+  wrapper.style.transform = wrapperTransform;
+};
 
 
     // Init
