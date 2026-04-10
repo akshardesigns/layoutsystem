@@ -10,8 +10,7 @@
 <canvas id="c" width="1080" height="1350"></canvas>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const data = JSON.parse(decodeURIComponent(params.get('data')));
+const data = JSON.parse(localStorage.getItem('exportData'));
 
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
