@@ -1,1 +1,136 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Export</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
 
+<canvas id="c" width="1080" height="1350"></canvas>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const data = JSON.parse(decodeURIComponent(params.get('data')));
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight, align='left') {
+  const words = text.split(' ');
+  let line = '';
+  let lines = [];
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + ' ';
+    if (ctx.measureText(testLine).width > maxWidth && i > 0) {
+      lines.push(line);
+      line = words[i] + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  lines.push(line);
+
+  lines.forEach((l, i) => {
+    ctx.textAlign = align;
+    ctx.fillText(l.trim(), x, y + (i * lineHeight));
+  });
+}
+
+function loadImage(src) {
+  return new Promise((res) => {
+    if (!src) return res(null);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => res(img);
+    img.onerror = () => res(null);
+    img.src = src;
+  });
+}
+
+function drawImageCover(ctx, img, x, y, w, h) {
+  const imgRatio = img.width / img.height;
+  const boxRatio = w / h;
+
+  let drawWidth, drawHeight, offsetX, offsetY;
+
+  if (imgRatio > boxRatio) {
+    drawHeight = h;
+    drawWidth = img.width * (h / img.height);
+    offsetX = (w - drawWidth) / 2;
+    offsetY = 0;
+  } else {
+    drawWidth = w;
+    drawHeight = img.height * (w / img.width);
+    offsetX = 0;
+    offsetY = (h - drawHeight) / 2;
+  }
+
+  ctx.drawImage(img, x + offsetX, y + offsetY, drawWidth, drawHeight);
+}
+
+// BG
+ctx.fillStyle = "#fff";
+ctx.fillRect(0, 0, 1080, 1350);
+
+// HEADLINE
+ctx.fillStyle = data.color || "#000";
+ctx.font = "900 140px 'Playfair Display'";
+wrapText(ctx, data.headline, 540, 160, 1000, 130, 'center');
+
+// SUB
+ctx.fillStyle = "#1f2937";
+ctx.font = "700 26px 'DM Sans'";
+wrapText(ctx, data.sub, 540, 380, 900, 32, 'center');
+
+(async () => {
+  const img = await loadImage(data.image);
+  if (img) drawImageCover(ctx, img, 40, 490, 1000, 540);
+
+  // TAGLINE
+  ctx.fillStyle = data.color;
+  ctx.font = "12px 'Space Mono'";
+  ctx.textAlign = "left";
+  ctx.fillText(data.tagline || '', 40, 1300);
+
+  // INFO
+  ctx.fillStyle = "#1f2937";
+  ctx.textAlign = "center";
+  ctx.fillText(data.info || '', 540, 1125);
+
+  // LINE
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.beginPath();
+  ctx.moveTo(40, 1125);
+  ctx.lineTo(300, 1125);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(780, 1125);
+  ctx.lineTo(1040, 1125);
+  ctx.stroke();
+
+  // DESC
+  ctx.fillStyle = "#374151";
+  ctx.font = "300 16px 'DM Sans'";
+  wrapText(ctx, data.desc1, 40, 1175, 480, 26, 'left');
+  wrapText(ctx, data.desc2, 1040, 1175, 480, 26, 'right');
+
+  // LOGO
+  const logo = await loadImage(data.logo);
+  if (logo) drawImageCover(ctx, logo, 980, 1250, 60, 60);
+
+  // DOWNLOAD
+  setTimeout(() => {
+    const link = document.createElement('a');
+    link.download = 'poster.png';
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }, 300);
+
+})();
+</script>
+
+</body>
+</html>
