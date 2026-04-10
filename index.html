@@ -1427,7 +1427,34 @@
   clone.style.background = '#ffffff';
 
   document.body.appendChild(clone);
+clone.querySelectorAll('.hero-image-area').forEach(hero => {
+clone.querySelectorAll('.hero-image-area').forEach(hero => {
+  const gradient = document.createElement('div');
 
+  gradient.style.position = 'absolute';
+  gradient.style.inset = '0';
+  gradient.style.pointerEvents = 'none';
+  gradient.style.zIndex = '2';
+
+  gradient.style.borderRadius = getComputedStyle(hero).borderRadius;
+
+  // 🔥 INI MENIRU MASK-IMAGE
+  gradient.style.background = `
+    linear-gradient(
+      to bottom,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0) 65%,
+      rgba(255,255,255,0.8) 85%,
+      rgba(255,255,255,1) 100%
+    )
+  `;
+
+  hero.style.position = 'relative';
+  hero.appendChild(gradient);
+});
+  hero.style.position = 'relative';
+  hero.appendChild(gradient);
+});
   // 3️⃣ FIX IMAGE (biar sama kayak preview)
   clone.querySelectorAll('img').forEach(img => {
     img.style.width = '100%';
