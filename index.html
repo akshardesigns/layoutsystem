@@ -1047,17 +1047,13 @@
     <div class="poster-wrapper" id="posterWrapper">
      <div class="poster-canvas rounded-2xl shadow-2xl layout-1" id="posterCanvas" style="background:#FFFFFF;"><!-- Headline BG -->
       <div class="headline-bg" id="p_headline" style="color:#C8553D;">
-  BEYOND THE EDGE
-</div>
-
-<div class="hero-image-area" id="p_hero">
-  <div class="w-full h-full flex items-center justify-center" style="background: #ffffff;" id="p_hero_placeholder">
-    <div class="text-center text-neutral-300">
-      <i data-lucide="image" style="width:48px;height:48px;margin:0 auto;display:block"></i>
-      <p class="text-xs font-mono mt-3 tracking-wider uppercase">Upload Visual Hook</p>
-    </div>
-  </div>
-</div>
+       BEYOND THE EDGE
+      </div><!-- Hero Image -->
+      <div class="hero-image-area" id="p_hero">
+       <div class="w-full h-full flex items-center justify-center" style="background: #ffffff;" id="p_hero_placeholder">
+        <div class="text-center text-neutral-300"><i data-lucide="image" style="width:48px;height:48px;margin:0 auto;display:block"></i>
+         <p class="text-xs font-mono mt-3 tracking-wider uppercase">Upload Visual Hook</p>
+        </div>
        </div>
       </div><!-- Side Images for Layouts 6, 7 --> <img id="p_side_image_left" class="side-image-left" style="display:none;" alt="Side Image Left"> <img id="p_side_image_center" class="side-image-center" style="display:none;" alt="Center Image"> <img id="p_side_image_right" class="side-image-right" style="display:none;" alt="Side Image Right"> <!-- Sub Headline -->
       <div class="sub-headline" id="p_sub" style="color:#1f2937;">
@@ -1431,26 +1427,6 @@
   clone.style.background = '#ffffff';
 
   document.body.appendChild(clone);
-  clone.querySelectorAll('.hero-image-area').forEach(hero => {
-  const gradient = document.createElement('div');
-
-  gradient.style.position = 'absolute';
-  gradient.style.inset = '0';
-  gradient.style.pointerEvents = 'none';
-  gradient.style.zIndex = '5';
-
-  gradient.style.background = `
-    linear-gradient(
-      to bottom,
-      rgba(255,255,255,0) 60%,
-      rgba(255,255,255,0.6) 85%,
-      rgba(255,255,255,1) 100%
-    )
-  `;
-
-  hero.style.position = 'relative';
-  hero.appendChild(gradient);
-});
 
   // 3️⃣ FIX IMAGE (biar sama kayak preview)
   clone.querySelectorAll('img').forEach(img => {
