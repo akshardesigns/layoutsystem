@@ -1410,17 +1410,35 @@
 
     // Export PNG handler
     document.getElementById('downloadPngBtn').onclick = async function () {
-  const wrapper = document.getElementById('posterWrapper');
-  const canvasEl = document.getElementById('posterCanvas');
+  const original = document.getElementById('posterCanvas');
 
-  // 🔥 SIMPAN SCALE
-  const wrapperTransform = wrapper.style.transform;
+  // 1️⃣ CLONE
+  const clone = original.cloneNode(true);
 
-  // 🔥 MATIKAN SCALE
-  wrapper.style.transform = 'none';
+  // 2️⃣ FIX SIZE & POSISI
+  clone.style.transform = 'none';
+  clone.style.width = '1080px';
+  clone.style.height = '1350px';
+  clone.style.position = 'fixed';
+  clone.style.top = '-9999px';
+  clone.style.left = '0';
+  clone.style.zIndex = '-1';
 
+  // 3️⃣ MASUKIN KE DOM (INI PENTING)
+  document.body.appendChild(clone);
+
+  // 4️⃣ 🔥 TARUH KODE LO DI SINI
+  const imgs = clone.querySelectorAll('img');
+
+  imgs.forEach(img => {
+    img.style.objectFit = 'cover';
+    img.style.width = '100%';
+    img.style.height = '100%';
+  });
+
+  // 5️⃣ BARU CAPTURE
   try {
-    const canvas = await html2canvas(canvasEl, {
+    const canvas = await html2canvas(clone, {
       scale: 2,
       useCORS: true,
       backgroundColor: '#ffffff'
@@ -1435,8 +1453,8 @@
     console.error(err);
   }
 
-  // 🔥 BALIKIN SCALE
-  wrapper.style.transform = wrapperTransform;
+  // 6️⃣ HAPUS CLONE
+  document.body.removeChild(clone);
 };
 
 
