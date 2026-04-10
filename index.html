@@ -1421,8 +1421,8 @@
         image: document.querySelector('#p_hero img')?.src || null,
         logo: document.querySelector('#p_brand img')?.src || null
       };
-      const encoded = encodeURIComponent(JSON.stringify(data));
-     window.open(`/layoutsystem/export.html?data=${encoded}`, '_blank');
+      localStorage.setItem('exportData', JSON.stringify(data));
+window.open('/layoutsystem/export.html', '_blank');
     });
 
 
