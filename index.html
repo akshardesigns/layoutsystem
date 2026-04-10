@@ -1,240 +1,43 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full">
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Export Poster as PNG</title>
+  <title>Layout System Generator</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&amp;family=DM+Sans:wght@300;400;500;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'display': ['Playfair Display', 'serif'],
+            'body': ['DM Sans', 'sans-serif'],
+            'mono': ['Space Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #1a1a1a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container {
-      background: white;
-      border-radius: 12px;
-      padding: 40px;
-      max-width: 1200px;
-      width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    h1 {
-      margin-bottom: 30px;
-      text-align: center;
-      color: #1a1a1a;
-    }
-    .export-wrapper {
-      display: flex;
-      gap: 40px;
-      align-items: flex-start;
-    }
-    .poster-display {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-    }
+    html, body { height: 100%; margin: 0; }
     .poster-canvas {
       width: 1080px;
       height: 1350px;
       position: relative;
       overflow: hidden;
+    }
+    .poster-wrapper {
+      transform-origin: top center;
+    }
+    /* LAYOUT 1: Full Width Center */
+    .poster-canvas.layout-1 {
       background: #ffffff;
       border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
     }
-    .controls {
-      flex: 0 0 300px;
-    }
-    .control-group {
-      margin-bottom: 20px;
-    }
-    .control-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: #666;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .control-group input, .control-group textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 14px;
-    }
-    .control-group textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
-    .export-btn {
-      width: 100%;
-      padding: 12px;
-      background: #1a1a1a;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transition: all 0.2s;
-      margin-top: 20px;
-    }
-    .export-btn:hover {
-      background: #333;
-    }
-    .export-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .status {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      text-align: center;
-      display: none;
-    }
-    .status.success {
-      background: #d4edda;
-      color: #155724;
-      display: block;
-    }
-    .status.error {
-      background: #f8d7da;
-      color: #721c24;
-      display: block;
-    }
-
-    /* Poster Styles */
-    .headline-bg {
-      position: absolute;
-      top: 50px;
-      left: 40px;
-      right: 40px;
-      z-index: 1;
-      font-family: 'Playfair Display', serif;
-      font-weight: 900;
-      font-size: 140px;
-      line-height: 0.92;
-      text-transform: uppercase;
-      letter-spacing: -3px;
-      word-break: break-word;
-      text-align: center;
-    }
-    .sub-headline {
-      position: absolute;
-      top: 380px;
-      left: 40px;
-      right: 40px;
-      z-index: 3;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 700;
-      font-size: 26px;
-      line-height: 1.35;
-      letter-spacing: -0.3px;
-      text-align: center;
-    }
-    .hero-image-area {
-      position: absolute;
-      top: 490px;
-      left: 40px;
-      right: 40px;
-      height: 540px;
-      z-index: 2;
-      overflow: hidden;
-      border-radius: 20px;
-      background: #f5f5f5;
-    }
-    .hero-image-area img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .tagline-area {
-      position: absolute;
-      bottom: 50px;
-      left: 40px;
-      z-index: 3;
-      font-family: 'Space Mono', monospace;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      text-align: left;
-    }
-    .info-bar {
-      position: absolute;
-      top: 1125px;
-      left: 40px;
-      right: 40px;
-      z-index: 3;
-      font-family: 'Space Mono', monospace;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 18px;
-      white-space: nowrap;
-    }
-    .info-bar .line {
-      flex: 1;
-      height: 1px;
-      background: #e5e7eb;
-    }
-    .two-col-text {
-      position: absolute;
-      top: 1175px;
-      left: 40px;
-      right: 40px;
-      z-index: 3;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-    }
-    .two-col-text .col-text {
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      font-size: 16px;
-      line-height: 1.7;
-      letter-spacing: 0.3px;
-      text-align: center;
-    }
-    .two-col-text .col-text:first-child {
-      text-align: left;
-    }
-    .two-col-text .col-text:last-child {
-      text-align: right;
-    }
-    .brand-area {
-      position: absolute;
-      bottom: 50px;
-      right: 40px;
-      z-index: 3;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      height: 38px;
-    }
-    .brand-area img {
-      height: 100%;
-      width: auto;
-    }
-    .side-image-left, .side-image-right {
-      display: none;
-    }
-
-    /* Layout Styles */
+    /* Layout 2: 50-50 split with image on right */
     .poster-canvas.layout-2 {
       background: #ffffff;
       border-radius: 12px;
@@ -297,14 +100,19 @@
       font-size: 14px;
       margin-bottom: 20px;
     }
+    .poster-canvas.layout-2 .two-col-text .col-text:last-child {
+      text-align: left;
+    }
     .poster-canvas.layout-2 .brand-area {
       bottom: 50px;
       right: auto;
       left: 40px;
       top: auto;
     }
-
-    /* Layout 3 */
+    /* Layout 3: Full-width image top, text bottom */
+    .poster-canvas.layout-3 {
+      background: #ffffff;
+    }
     .poster-canvas.layout-3 .hero-image-area {
       top: 20px;
       left: 40px;
@@ -329,6 +137,13 @@
       left: 40px;
       font-size: 11px;
     }
+    .poster-canvas.layout-3 .info-bar {
+      top: 650px;
+      left: 40px;
+      transform: none;
+      width: calc(100% - 80px);
+      max-width: none;
+    }
     .poster-canvas.layout-3 .two-col-text {
       top: 1060px;
       left: 40px;
@@ -341,8 +156,14 @@
       font-size: 14px;
       margin-bottom: 12px;
     }
-
-    /* Layout 4 */
+    .poster-canvas.layout-3 .brand-area {
+      bottom: 50px;
+      right: 40px;
+    }
+    /* Layout 4: Diagonal split with image */
+    .poster-canvas.layout-4 {
+      background: #ffffff;
+    }
     .poster-canvas.layout-4 .hero-image-area {
       top: 40px;
       left: 40px;
@@ -372,6 +193,18 @@
       left: 55%;
       font-size: 12px;
     }
+    .poster-canvas.layout-4 .info-bar {
+      top: auto;
+      bottom: 300px;
+      left: 55%;
+      right: 40px;
+      width: auto;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .poster-canvas.layout-4 .info-bar .line {
+      display: none;
+    }
     .poster-canvas.layout-4 .two-col-text {
       top: 800px;
       left: 55%;
@@ -384,8 +217,14 @@
       font-size: 13px;
       margin-bottom: 16px;
     }
-
-    /* Layout 5 */
+    .poster-canvas.layout-4 .brand-area {
+      bottom: 50px;
+      right: 40px;
+    }
+    /* Layout 5: Image centered with text wrap */
+    .poster-canvas.layout-5 {
+      background: #ffffff;
+    }
     .poster-canvas.layout-5 .hero-image-area {
       top: 50px;
       left: 50%;
@@ -419,6 +258,15 @@
       font-size: 11px;
       text-align: center;
     }
+    .poster-canvas.layout-5 .info-bar {
+      top: 550px;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      width: auto;
+      justify-content: center;
+      padding: 0;
+    }
     .poster-canvas.layout-5 .two-col-text {
       top: 888px;
       left: 50%;
@@ -427,363 +275,1160 @@
       width: 600px;
       grid-template-columns: 1fr;
       gap: 0;
+      padding: 0 40px;
     }
     .poster-canvas.layout-5 .two-col-text .col-text {
       text-align: center;
       font-size: 20px;
       margin-bottom: 45px;
       line-height: 1.6;
+      color: #4b5563;
     }
-
-    @media (max-width: 768px) {
-      .export-wrapper {
-        flex-direction: column;
-        gap: 20px;
-      }
-      .controls {
-        flex: 1;
-      }
-      .poster-display {
-        transform: scale(0.5);
-        transform-origin: top center;
-        margin-bottom: -300px;
-      }
+    .poster-canvas.layout-5 .two-col-text .col-text:last-child {
+      text-align: center;
+    }
+    .poster-canvas.layout-5 .brand-area {
+      bottom: 50px;
+      right: 40px;
+    }
+    /* Layout 6: Left and right images with center text overlay */
+    .poster-canvas.layout-6 {
+      background: #ffffff;
+    }
+    .poster-canvas.layout-6 .hero-image-area {
+      display: none;
+    }
+    .poster-canvas.layout-6 .hero-image-area img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .poster-canvas.layout-6 .hero-image-area::after {
+      display: none;
+    }
+    .poster-canvas.layout-6 .side-image-center {
+      display: none;
+    }
+    .poster-canvas.layout-6 .side-image-left {
+      position: absolute;
+      top: 40px;
+      left: 40px;
+      width: 30%;
+      height: 1270px;
+      object-fit: cover;
+      z-index: 1;
+      display: block;
+      opacity: 0.35;
+      -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+      mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+    }
+    .poster-canvas.layout-6 .side-image-right {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      width: 30%;
+      height: 1270px;
+      object-fit: cover;
+      z-index: 1;
+      display: block;
+      opacity: 0.35;
+      -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+      mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+    }
+    .poster-canvas.layout-6 .sub-headline {
+      top: 400px;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      width: 600px;
+      font-size: 20px;
+      text-align: center;
+      position: absolute;
+      z-index: 3;
+      margin-bottom: 0;
+    }
+    .poster-canvas.layout-6 .headline-bg {
+      top: 440px;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      width: 600px;
+      font-size: 140px;
+      font-weight: 500;
+      line-height: 0.95;
+      text-align: center;
+      z-index: 2;
+      position: absolute;
+      word-break: break-word;
+    }
+    .poster-canvas.layout-6 .tagline-area {
+      top: 80px;
+      bottom: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      font-size: 12px;
+      position: absolute;
+      z-index: 3;
+      text-align: center;
+    }
+    .poster-canvas.layout-6 .info-bar {
+      top: 880px;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      width: 600px;
+      justify-content: center;
+      flex-direction: row;
+      position: absolute;
+      z-index: 3;
+    }
+    .poster-canvas.layout-6 .info-bar .line {
+      display: none;
+    }
+    .poster-canvas.layout-6 .two-col-text {
+      top: 950px;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      width: 600px;
+      grid-template-columns: 1fr;
+      gap: 0;
+      position: absolute;
+      z-index: 3;
+    }
+    .poster-canvas.layout-6 .two-col-text .col-text {
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .poster-canvas.layout-6 .brand-area {
+      bottom: 50px;
+      right: 40px;
+      position: relative;
+      z-index: 3;
+    }
+    /* Layout 7: Center text with circular images - top right (small) and bottom left (large) */
+    .poster-canvas.layout-7 {
+      background: #ffffff;
+    }
+    .poster-canvas.layout-7 .hero-image-area {
+      display: none;
+    }
+    .poster-canvas.layout-7 .hero-image-area img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .poster-canvas.layout-7 .hero-image-area::after {
+      display: none;
+    }
+    .poster-canvas.layout-7 .side-image-right {
+      position: absolute;
+      top: 420px;
+      right: 40px;
+      width: 280px;
+      height: 280px;
+      object-fit: cover;
+      z-index: 1;
+      display: block;
+      opacity: 1;
+      border-radius: 50%;
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+    .poster-canvas.layout-7 .side-image-left {
+      position: absolute;
+      bottom: 150px;
+      left: 40px;
+      width: 380px;
+      height: 380px;
+      object-fit: cover;
+      z-index: 1;
+      display: block;
+      opacity: 1;
+      border-radius: 50%;
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+    .poster-canvas.layout-7 .side-image-center {
+      display: none;
+    }
+    .poster-canvas.layout-7 .sub-headline {
+      top: 645px;
+      left: 40px;
+      transform: none;
+      right: auto;
+      width: 500px;
+      font-size: 28px;
+      text-align: left;
+      position: absolute;
+      z-index: 3;
+      margin-bottom: 0;
+    }
+    .poster-canvas.layout-7 .headline-bg {
+      top: 80px;
+      left: 40px;
+      transform: none;
+      right: 220px;
+      width: auto;
+      font-size: 160px;
+      font-weight: 500;
+      line-height: 1.1;
+      text-align: left;
+      z-index: 2;
+      position: absolute;
+      word-break: break-word;
+      max-height: 528px;
+      overflow: hidden;
+      word-spacing: 9999px;
+    }
+    .poster-canvas.layout-7 .tagline-area {
+      top: 60px;
+      bottom: auto;
+      left: 40px;
+      transform: none;
+      right: auto;
+      font-size: 13.2px;
+      position: absolute;
+      z-index: 3;
+      text-align: left;
+    }
+    .poster-canvas.layout-7 .info-bar {
+      top: auto;
+      bottom: 50px;
+      left: 40px;
+      transform: none;
+      right: auto;
+      width: auto;
+      justify-content: flex-start;
+      flex-direction: row;
+      position: absolute;
+      z-index: 3;
+    }
+    .poster-canvas.layout-7 .info-bar .line {
+      display: none;
+    }
+    .poster-canvas.layout-7 .two-col-text {
+      top: auto;
+      bottom: 120px;
+      left: auto;
+      transform: none;
+      right: 40px;
+      width: 420px;
+      grid-template-columns: 1fr;
+      gap: 0;
+      position: absolute;
+      z-index: 3;
+    }
+    .poster-canvas.layout-7 .two-col-text .col-text {
+      text-align: right;
+      font-size: 22.1px;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+    .poster-canvas.layout-7 .brand-area {
+      bottom: 50px;
+      right: 40px;
+      position: relative;
+      z-index: 3;
+    }
+    .poster-canvas.layout-7 .top-right-line {
+      position: absolute;
+      top: 60px;
+      right: 40px;
+      width: 120px;
+      height: 2px;
+      background: #374151;
+      z-index: 3;
+    }
+    /* Layout 8: Right image, left text stacked */
+    .poster-canvas.layout-8 {
+      background: #ffffff;
+    }
+    .poster-canvas.layout-8 .hero-image-area {
+      top: 150px;
+      left: 340px;
+      right: auto;
+      width: 744px;
+      height: 432px;
+      border-radius: 0px;
+    }
+    .poster-canvas.layout-8 .layout-8-anchor-line {
+      position: absolute;
+      top: 1230px;
+      left: 100px;
+      width: 680px;
+      height: 10px;
+      z-index: 3;
+    }
+    .poster-canvas.layout-8 .headline-bg {
+      top: 567.5px;
+      left: 100px;
+      right: auto;
+      width: 780px;
+      height: auto;
+      font-size: 149.5px;
+      font-weight: 700;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      text-align: left;
+      z-index: 2;
+      word-break: break-word;
+      overflow: visible;
+      white-space: normal;
+      word-spacing: 9999px;
+      display: flex;
+      align-items: flex-end;
+    }
+    .poster-canvas.layout-8 .sub-headline {
+      top: 1029px;
+      left: 100px;
+      right: auto;
+      width: 600px;
+      height: 60px;
+      font-size: 26px;
+      font-weight: 500;
+      line-height: 1.2;
+      text-align: left;
+    }
+    .poster-canvas.layout-8 .tagline-area {
+      top: 60px;
+      bottom: auto;
+      left: 40px;
+      font-size: 33px;
+      font-weight: 400;
+      max-width: 400px;
+      line-height: 1.3;
+    }
+    .poster-canvas.layout-8 .info-bar {
+      top: 1180px;
+      left: 100px;
+      right: auto;
+      width: 780px;
+      height: auto;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 21px;
+      font-weight: 500;
+      max-width: none;
+      padding: 0;
+      border: none;
+      border-bottom: none !important;
+      padding-bottom: 24px;
+      position: relative;
+    }
+    .poster-canvas.layout-8 .info-bar::after {
+      display: none;
+    }
+    .poster-canvas.layout-8 .info-bar::before {
+      display: none;
+    }
+    .poster-canvas.layout-8 .info-bar .line {
+      display: none;
+    }
+    .poster-canvas.layout-8 .two-col-text {
+      top: auto;
+      bottom: 310px;
+      left: auto;
+      right: 40px;
+      width: 200px;
+      height: 180px;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .poster-canvas.layout-8 .two-col-text .col-text {
+      text-align: right;
+      font-size: 13px;
+      font-weight: 300;
+      margin-bottom: 20px;
+    }
+    .poster-canvas.layout-8 .brand-area {
+      bottom: 50px;
+      left: 40px;
+      right: auto;
+    }
+    /* Layout 9: Image bottom, text top */
+    .poster-canvas.layout-9 {
+      background: #ffffff;
+    }
+    .poster-canvas.layout-9 .hero-image-area {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 900px;
+      border-radius: 0;
+      mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);
+    }
+    .poster-canvas.layout-9 .hero-image-area::after {
+      display: none;
+    }
+    .poster-canvas.layout-9 .headline-bg {
+      top: 167.5px;
+      left: 40px;
+      right: 40px;
+      width: calc(100% - 80px);
+      font-size: 99.2px;
+      font-weight: 500;
+      text-align: center;
+      z-index: 2;
+      word-spacing: normal;
+      line-height: 1.1;
+      max-height: none;
+      overflow: visible;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .poster-canvas.layout-9 .sub-headline {
+      top: 386px;
+      left: 40px;
+      right: 40px;
+      font-size: 19px;
+      text-align: center;
+    }
+    .poster-canvas.layout-9 .tagline-area {
+      top: 40px;
+      bottom: auto;
+      left: 40px;
+      transform: none;
+      font-size: 11px;
+      text-align: left;
+    }
+    .poster-canvas.layout-9 .info-bar {
+      top: 145px;
+      left: 50%;
+      transform: translateX(-50%);
+      right: auto;
+      width: auto;
+      justify-content: center;
+    }
+    .poster-canvas.layout-9 .two-col-text {
+      top: 470px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .poster-canvas.layout-9 .two-col-text .col-text {
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+    .poster-canvas.layout-9 .brand-area {
+      top: 50px;
+      bottom: auto;
+      right: 40px;
+    }
+    #posterWrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      position: relative;
+    }
+    .swipe-indicator {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.4;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 10;
+    }
+    .swipe-indicator.left {
+      left: 12px;
+    }
+    .swipe-indicator.right {
+      right: 12px;
+    }
+    #posterWrapper:hover .swipe-indicator {
+      opacity: 0.7;
+    }
+    .swipe-indicator i {
+      width: 32px;
+      height: 32px;
+      color: #9ca3af;
+    }
+    .headline-bg {
+      position: absolute;
+      top: 50px;
+      left: 40px;
+      right: 40px;
+      z-index: 1;
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 140px;
+      line-height: 0.92;
+      text-transform: uppercase;
+      letter-spacing: -3px;
+      word-break: break-word;
+      text-align: center;
+    }
+    .sub-headline {
+      position: absolute;
+      top: 380px;
+      left: 40px;
+      right: 40px;
+      z-index: 3;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 26px;
+      line-height: 1.35;
+      letter-spacing: -0.3px;
+      text-align: center;
+    }
+    .hero-image-area {
+      position: absolute;
+      top: 490px;
+      left: 40px;
+      right: 40px;
+      height: 540px;
+      z-index: 2;
+      overflow: hidden;
+      border-radius: 20px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
+    }
+    .hero-image-area img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .hero-image-area::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, transparent 0%, transparent 70%, rgba(255,255,255,1) 100%);
+      pointer-events: none;
+      z-index: 10;
+    }
+    .tagline-area {
+      position: absolute;
+      bottom: 50px;
+      left: 40px;
+      z-index: 3;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-align: left;
+    }
+    .info-bar {
+      position: absolute;
+      top: 1125px;
+      left: 40px;
+      right: 40px;
+      z-index: 3;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      white-space: nowrap;
+    }
+    .info-bar .line {
+      flex: 1;
+      height: 1px;
+    }
+    .two-col-text {
+      position: absolute;
+      top: 1175px;
+      left: 40px;
+      right: 40px;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+    }
+    .two-col-text .col-text {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 1.7;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+    .two-col-text .col-text:first-child {
+      text-align: left;
+    }
+    .two-col-text .col-text:last-child {
+      text-align: right;
+    }
+    .brand-area {
+      position: absolute;
+      bottom: 50px;
+      right: 40px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-area img {
+      height: 38px;
+      width: auto;
+    }
+    .drop-zone {
+      border: 2px dashed #e5e7eb;
+      transition: all 0.2s;
+      cursor: pointer;
+      background: #f9fafb;
+    }
+    .drop-zone:hover {
+      border-color: #d1d5db;
+      background: #f3f4f6;
+    }
+    input[type="text"], textarea {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, textarea:focus {
+      border-color: #9ca3af;
+      outline: none;
+      background: #f9fafb;
+    }
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 6px; }
+    body { box-sizing: border-box; }
+    .layout-slider-container {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding: 4px 0;
+    }
+    .layout-slider-container::-webkit-scrollbar {
+      height: 4px;
+    }
+    .layout-slider-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .layout-slider-container::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 2px;
+    }
+    .layout-slider-item {
+      flex-shrink: 0;
+      width: 120px;
+      height: 160px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .layout-slider-item:hover {
+      border-color: #9ca3af;
+    }
+    .layout-slider-item.active {
+      border-color: #1f2937;
+      box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+    }
+    .layout-slider-item-preview {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d1d5db;
+      background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+      font-weight: bold;
+      font-size: 11px;
+      text-align: center;
+      padding: 4px;
+      line-height: 1.2;
+      position: relative;
+    }
+    .layout-slider-item-preview svg {
+      width: 80%;
+      height: 80%;
+      opacity: 0.5;
+    }
+    .layout-slider-item-label {
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 9px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&amp;family=DM+Sans:wght@300;400;500;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
-  <style>body { box-sizing: border-box; }</style>
-  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
  </head>
- <body>
-  <div class="container">
-   <h1>Export Your Poster</h1>
-   <div class="export-wrapper">
-    <div class="poster-display">
-     <div class="poster-canvas" id="posterCanvas">
-      <div class="headline-bg" id="p_headline" style="color:#C8553D;">
-       BEYOND THE EDGE
+ <body class="h-full bg-neutral-50 text-neutral-900 font-body overflow-auto">
+  <div id="app" class="w-full min-h-full">
+   <!-- Header -->
+   <div class="px-6 py-5 border-b border-neutral-200 flex items-center justify-between">
+    <div>
+     <p class="text-neutral-400 text-[10px] font-mono tracking-wider mb-2">By Akshardesign.id</p>
+     <h1 id="app-title" class="font-display text-xl font-bold tracking-tight text-neutral-900">Layout System</h1>
+     <p class="text-neutral-400 text-[10px] font-mono mt-1 tracking-wider uppercase whitespace-nowrap">Fixed Composition System</p>
+    </div>
+   </div><!-- Input Fields -->
+   <div class="px-6 py-6 border-b border-white/5">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-[1200px] mx-auto">
+     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Judul (Headline)</label> <input type="text" id="inp_judul" value="BEYOND THE EDGE" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
+     </div>
+     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Sub Judul</label> <input type="text" id="inp_sub_judul" value="Exploring the invisible boundaries of modern creative culture" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
+     </div>
+     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Deskripsi 1</label> <textarea id="inp_desc1" rows="2" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300 resize-none">A visual essay on the tension between minimalism and expression. We strip away the unnecessary to reveal what truly matters in design.</textarea>
+     </div>
+     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Deskripsi 2</label> <textarea id="inp_desc2" rows="2" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300 resize-none">Through careful composition and deliberate restraint, each element finds its purpose. Nothing is accidental — every pixel is intentional.</textarea>
+     </div>
+     <div><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Info Tambahan</label> <input type="text" id="inp_info" value="VOL. 03 — 2025 EDITION" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
+     </div>
+     <div><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Tagline</label> <input type="text" id="inp_tagline" value="FORM FOLLOWS FEELING" class="w-full px-3 py-2 rounded-lg text-xs text-neutral-900 bg-white border border-neutral-300">
+     </div>
+     <div><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Theme Color</label>
+      <div class="flex items-center gap-2">
+       <input type="color" id="inp_color" value="#C8553D" class="w-8 h-8 rounded-lg"> <span id="color_label" class="text-[10px] font-mono text-neutral-500">#C8553D</span>
       </div>
-      <div class="hero-image-area" id="p_hero">
-       <div style="width:100%;height:100%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:12px;">
-        No Image
-       </div>
-      </div>
-      <div class="sub-headline" id="p_sub" style="color:#1f2937;">
-       Exploring the invisible boundaries of modern creative culture
-      </div>
-      <div class="tagline-area" id="p_tagline" style="color:#C8553D;">
-       FORM FOLLOWS FEELING
-      </div>
-      <div class="info-bar" id="p_info_bar">
-       <span style="color:#1f2937;" id="p_info">VOL. 03 — 2025 EDITION</span>
-       <div class="line"></div>
-      </div>
-      <div class="two-col-text">
-       <div class="col-text" id="p_desc1" style="color:#374151;">
-        A visual essay on the tension between minimalism and expression.
-       </div>
-       <div class="col-text" id="p_desc2" style="color:#374151;">
-        Through careful composition and deliberate restraint, each element finds its purpose.
-       </div>
-      </div>
-      <div class="brand-area" id="p_brand"></div><img class="side-image-left" id="p_side_image_left" alt="Side Image Left"> <img class="side-image-right" id="p_side_image_right" alt="Side Image Right">
+     </div>
+     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Visual Hook</label>
+      <div id="drop_visual" class="drop-zone rounded-lg h-14 flex items-center justify-center gap-2 text-neutral-400 text-[10px] font-mono">
+       <i data-lucide="image" style="width:12px;height:12px"></i> <span id="visual_label">Click to upload</span>
+      </div><input type="file" id="file_visual" accept="image/*" class="hidden">
+     </div>
+     <div class="col-span-full"><label class="block text-[9px] font-mono uppercase tracking-widest text-neutral-500 mb-1">Brand Logo</label>
+      <div id="drop_logo" class="drop-zone rounded-lg h-14 flex items-center justify-center gap-2 text-neutral-400 text-[10px] font-mono">
+       <i data-lucide="shapes" style="width:12px;height:12px"></i> <span id="logo_label">Click to upload</span>
+      </div><input type="file" id="file_logo" accept="image/*" class="hidden">
      </div>
     </div>
-    <div class="controls">
-     <div class="control-group">
-      <label>Headline</label> <input type="text" id="inp_headline" value="BEYOND THE EDGE">
+   </div><!-- Layout Selector with Slider -->
+   <div class="px-6 py-6 border-b border-neutral-200 flex flex-col gap-4 bg-white">
+    <div class="flex items-center justify-between gap-2">
+     <button id="prevBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors flex-shrink-0"><i data-lucide="chevron-left" style="width:20px;height:20px;"></i></button>
+     <div class="flex-1 overflow-hidden">
+      <div class="layout-slider-container" id="layoutSlider"></div>
+     </div><button id="nextBtn" class="p-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 transition-colors flex-shrink-0"><i data-lucide="chevron-right" style="width:20px;height:20px;"></i></button>
+    </div>
+    <div class="flex items-center justify-between gap-4">
+     <div class="flex-1 text-center">
+      <p id="layoutIndicator" class="text-sm font-display font-bold text-neutral-900">Layout 1</p>
+      <p class="text-xs text-neutral-400 font-mono mt-1 tracking-wider uppercase" id="layoutCounter">1 / 9</p>
+     </div><button id="downloadPngBtn" class="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-mono tracking-wider uppercase transition-colors flex items-center gap-2 flex-shrink-0"><i data-lucide="download" style="width:14px;height:14px;"></i> Export PNG</button>
+    </div>
+   </div><!-- Live Preview -->
+   <div class="py-10 flex justify-center">
+    <div class="poster-wrapper" id="posterWrapper">
+     <div class="poster-canvas rounded-2xl shadow-2xl layout-1" id="posterCanvas" style="background:#FFFFFF;"><!-- Headline BG -->
+      <div class="headline-bg" id="p_headline" style="color:#C8553D;">
+       BEYOND THE EDGE
+      </div><!-- Hero Image -->
+      <div class="hero-image-area" id="p_hero">
+       <div class="w-full h-full flex items-center justify-center" style="background: #ffffff;" id="p_hero_placeholder">
+        <div class="text-center text-neutral-300"><i data-lucide="image" style="width:48px;height:48px;margin:0 auto;display:block"></i>
+         <p class="text-xs font-mono mt-3 tracking-wider uppercase">Upload Visual Hook</p>
+        </div>
+       </div>
+      </div><!-- Side Images for Layouts 6, 7 --> <img id="p_side_image_left" class="side-image-left" style="display:none;" alt="Side Image Left"> <img id="p_side_image_center" class="side-image-center" style="display:none;" alt="Center Image"> <img id="p_side_image_right" class="side-image-right" style="display:none;" alt="Side Image Right"> <!-- Sub Headline -->
+      <div class="sub-headline" id="p_sub" style="color:#1f2937;">
+       Exploring the invisible boundaries of modern creative culture
+      </div><!-- Tagline -->
+      <div class="tagline-area" id="p_tagline" style="color:#C8553D;">
+       FORM FOLLOWS FEELING
+      </div><!-- Info Bar -->
+      <div class="info-bar" id="p_info_bar"><span style="color:#1f2937;" id="p_info">VOL. 03 — 2025 EDITION</span>
+       <div class="line" id="p_info_line" style="background:#e5e7eb;"></div>
+      </div><!-- Two Column Text -->
+      <div class="two-col-text">
+       <div class="col-text" id="p_desc1" style="color:#374151;">
+        A visual essay on the tension between minimalism and expression. We strip away the unnecessary to reveal what truly matters in design.
+       </div>
+       <div class="col-text" id="p_desc2" style="color:#374151;">
+        Through careful composition and deliberate restraint, each element finds its purpose. Nothing is accidental — every pixel is intentional.
+       </div>
+      </div><!-- Brand Area -->
+      <div class="brand-area" id="p_brand">
+       <div id="p_logo_placeholder" class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(255,255,255,0.08);"><i data-lucide="hexagon" style="width:18px;height:18px;color:rgba(255,255,255,0.25)"></i>
+       </div>
+      </div><!-- Layout 7: Top right line -->
+      <div class="top-right-line"></div><!-- Layout 8: Bottom anchor line -->
+      <div class="layout-8-anchor-line" id="p_layout8_line"></div>
      </div>
-     <div class="control-group">
-      <label>Sub Headline</label> <input type="text" id="inp_sub" value="Exploring the invisible boundaries of modern creative culture">
+     <div class="swipe-indicator right"><i data-lucide="chevron-right"></i>
      </div>
-     <div class="control-group">
-      <label>Description 1</label> <textarea id="inp_desc1">A visual essay on the tension between minimalism and expression.</textarea>
-     </div>
-     <div class="control-group">
-      <label>Description 2</label> <textarea id="inp_desc2">Through careful composition and deliberate restraint, each element finds its purpose.</textarea>
-     </div>
-     <div class="control-group">
-      <label>Info</label> <input type="text" id="inp_info" value="VOL. 03 — 2025 EDITION">
-     </div>
-     <div class="control-group">
-      <label>Tagline</label> <input type="text" id="inp_tagline" value="FORM FOLLOWS FEELING">
-     </div>
-     <div class="control-group">
-      <label>Theme Color</label> <input type="color" id="inp_color" value="#C8553D">
-     </div>
-     <div class="control-group">
-      <label>Layout</label> <select id="inp_layout" style="width:100%;padding:10px;border:1px solid #e0e0e0;border-radius:6px;"> <option value="1">Layout 1 - Full Width</option> <option value="2">Layout 2 - 50-50 Split</option> <option value="3">Layout 3 - Image Top</option> <option value="4">Layout 4 - Diagonal</option> <option value="5">Layout 5 - Centered</option> </select>
-     </div><button class="export-btn" id="exportBtn">Export as PNG</button>
-     <div class="status" id="status"></div>
     </div>
    </div>
   </div>
   <script>
-    // Canvas dimensions (1080x1350)
-    const CANVAS_WIDTH = 1080;
-    const CANVAS_HEIGHT = 1350;
-    const SCALE = 2; // 2x for better quality
+    // --- Element SDK (optional) ---
+    if (window.elementSdk) {
+      const defaultConfig = {
+        app_title: 'Poster Layout System'
+      };
 
-    // Parse data from URL
-    const params = new URLSearchParams(window.location.search);
-    const data = params.get('data') ? JSON.parse(decodeURIComponent(params.get('data'))) : {};
-
-    // Populate fields from data
-    if (data.headline) document.getElementById('inp_headline').value = data.headline;
-    if (data.sub) document.getElementById('inp_sub').value = data.sub;
-    if (data.desc1) document.getElementById('inp_desc1').value = data.desc1;
-    if (data.desc2) document.getElementById('inp_desc2').value = data.desc2;
-    if (data.info) document.getElementById('inp_info').value = data.info;
-    if (data.tagline) document.getElementById('inp_tagline').value = data.tagline;
-    if (data.color) document.getElementById('inp_color').value = data.color;
-    if (data.layout) document.getElementById('inp_layout').value = data.layout;
-
-    // Image storage
-    let heroImage = null;
-    let logoImage = null;
-
-    // Load image with promise
-    const loadImage = (src) => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = src;
-      });
-    };
-
-    // Add image to hero area if exists
-    if (data.image) {
-      loadImage(data.image).then(img => {
-        heroImage = img;
-        document.getElementById('p_hero').innerHTML = `<img src="${data.image}" alt="Hero Image">`;
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          const t = document.getElementById('app-title');
+          if (t) t.textContent = config.app_title || defaultConfig.app_title;
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['app_title', config.app_title || defaultConfig.app_title]
+        ])
       });
     }
 
-    // Add logo if exists
-    if (data.logo) {
-      loadImage(data.logo).then(img => {
-        logoImage = img;
-        document.getElementById('p_brand').innerHTML = `<img src="${data.logo}" alt="Brand Logo">`;
-      });
+    // --- Layout switching with swipe support ---
+    let currentLayout = 1;
+    let lastUploadedImage = null;
+    let touchStartX = 0;
+    
+    function generateLayoutSlider() {
+      const slider = document.getElementById('layoutSlider');
+      slider.innerHTML = '';
+      const layoutPreviews = [
+        // Layout 1: Full Width - centered text
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="20" x2="90" y2="20" stroke="#9ca3af" stroke-width="8"/>
+          <line x1="10" y1="35" x2="90" y2="35" stroke="#d1d5db" stroke-width="3"/>
+          <rect x="10" y="50" width="80" height="50" fill="#e5e7eb" rx="2"/>
+          <line x1="10" y1="110" x2="90" y2="110" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 2: 50-50 Split - text left, image right
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="10" x2="40" y2="10" stroke="#9ca3af" stroke-width="6"/>
+          <line x1="10" y1="25" x2="40" y2="25" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="35" x2="40" y2="35" stroke="#d1d5db" stroke-width="2"/>
+          <rect x="50" y="10" width="40" height="100" fill="#e5e7eb" rx="2"/>
+          <line x1="10" y1="130" x2="40" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 3: Image Top, Text Bottom - full width stacked
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <rect x="10" y="10" width="80" height="50" fill="#e5e7eb" rx="2"/>
+          <line x1="10" y1="70" x2="90" y2="70" stroke="#9ca3af" stroke-width="6"/>
+          <line x1="10" y1="82" x2="90" y2="82" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="90" x2="90" y2="90" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="130" x2="90" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 4: Diagonal - image left, text right
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <rect x="10" y="15" width="35" height="60" fill="#e5e7eb" rx="2"/>
+          <line x1="55" y1="20" x2="90" y2="20" stroke="#9ca3af" stroke-width="5"/>
+          <line x1="55" y1="32" x2="90" y2="32" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="55" y1="42" x2="90" y2="42" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="130" x2="90" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 5: Centered Image with text wrap
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="10" x2="90" y2="10" stroke="#9ca3af" stroke-width="2"/>
+          <circle cx="50" cy="40" r="18" fill="#e5e7eb"/>
+          <line x1="15" y1="65" x2="85" y2="65" stroke="#9ca3af" stroke-width="4"/>
+          <line x1="20" y1="78" x2="80" y2="78" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="20" y1="88" x2="80" y2="88" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="130" x2="90" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 6: Faded Sides - side images with center text
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <rect x="5" y="10" width="15" height="100" fill="#d1d5db" opacity="0.3" rx="1"/>
+          <rect x="80" y="10" width="15" height="100" fill="#d1d5db" opacity="0.3" rx="1"/>
+          <line x1="30" y1="30" x2="70" y2="30" stroke="#9ca3af" stroke-width="6"/>
+          <line x1="35" y1="45" x2="65" y2="45" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="35" y1="55" x2="65" y2="55" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="130" x2="90" y2="130" stroke="#9ca3af" stroke-width="2"/>
+        </svg>`,
+        // Layout 7: Circular Images - circles with text
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <circle cx="75" cy="35" r="12" fill="#e5e7eb"/>
+          <line x1="10" y1="20" x2="55" y2="20" stroke="#9ca3af" stroke-width="5"/>
+          <line x1="10" y1="32" x2="55" y2="32" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="42" x2="55" y2="42" stroke="#d1d5db" stroke-width="2"/>
+          <circle cx="20" cy="95" r="18" fill="#e5e7eb"/>
+          <line x1="50" y1="100" x2="90" y2="100" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="50" y1="110" x2="90" y2="110" stroke="#d1d5db" stroke-width="2"/>
+        </svg>`,
+        // Layout 8: Right Image - text left, image right with color bar
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="15" x2="45" y2="15" stroke="#9ca3af" stroke-width="2"/>
+          <line x1="10" y1="25" x2="45" y2="25" stroke="#9ca3af" stroke-width="5"/>
+          <line x1="10" y1="38" x2="45" y2="38" stroke="#d1d5db" stroke-width="2"/>
+          <rect x="50" y="15" width="40" height="40" fill="#e5e7eb" rx="1"/>
+          <line x1="10" y1="48" x2="45" y2="48" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="56" x2="45" y2="56" stroke="#d1d5db" stroke-width="2"/>
+          <rect x="90" y="0" width="10" height="140" fill="#9ca3af"/>
+        </svg>`,
+        // Layout 9: Image Bottom - text top, image bottom faded
+        `<svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" fill="#f9fafb"/>
+          <line x1="10" y1="15" x2="90" y2="15" stroke="#9ca3af" stroke-width="6"/>
+          <line x1="10" y1="27" x2="90" y2="27" stroke="#d1d5db" stroke-width="2"/>
+          <line x1="10" y1="37" x2="90" y2="37" stroke="#d1d5db" stroke-width="2"/>
+          <rect x="10" y="50" width="80" height="60" fill="#e5e7eb" opacity="0.4" rx="2"/>
+        </svg>`
+      ];
+      
+      for (let i = 1; i <= 9; i++) {
+        const slide = document.createElement('div');
+        slide.className = `layout-slider-item ${i === 1 ? 'active' : ''}`;
+        slide.dataset.layout = i;
+        const labels = ['Full Width', '50-50 Split', 'Image Top', 'Diagonal', 'Centered', 'Faded Sides', 'Circles', 'Right Image', 'Image Bottom'];
+        slide.innerHTML = `<div class="layout-slider-item-preview">${layoutPreviews[i-1]}</div><div class="layout-slider-item-label">${labels[i-1]}</div>`;
+        slide.addEventListener('click', () => updateLayout(i));
+        slider.appendChild(slide);
+      }
     }
 
-    // Update display when inputs change
-    const updateDisplay = () => {
-      document.getElementById('p_headline').textContent = document.getElementById('inp_headline').value;
-      document.getElementById('p_sub').textContent = document.getElementById('inp_sub').value;
-      document.getElementById('p_desc1').textContent = document.getElementById('inp_desc1').value;
-      document.getElementById('p_desc2').textContent = document.getElementById('inp_desc2').value;
-      document.getElementById('p_info').textContent = document.getElementById('inp_info').value;
-      document.getElementById('p_tagline').textContent = document.getElementById('inp_tagline').value;
-
-      const color = document.getElementById('inp_color').value;
-      document.getElementById('p_headline').style.color = color;
-      document.getElementById('p_tagline').style.color = color;
-
-      const layout = document.getElementById('inp_layout').value;
+    function updateLayout(layoutNum) {
+      currentLayout = layoutNum;
       const canvas = document.getElementById('posterCanvas');
-      canvas.classList.remove('layout-1', 'layout-2', 'layout-3', 'layout-4', 'layout-5');
-      if (layout !== '1') {
-        canvas.classList.add(`layout-${layout}`);
-      }
-    };
-
-    document.getElementById('inp_headline').addEventListener('input', updateDisplay);
-    document.getElementById('inp_sub').addEventListener('input', updateDisplay);
-    document.getElementById('inp_desc1').addEventListener('input', updateDisplay);
-    document.getElementById('inp_desc2').addEventListener('input', updateDisplay);
-    document.getElementById('inp_info').addEventListener('input', updateDisplay);
-    document.getElementById('inp_tagline').addEventListener('input', updateDisplay);
-    document.getElementById('inp_color').addEventListener('input', updateDisplay);
-    document.getElementById('inp_layout').addEventListener('change', updateDisplay);
-
-    // Canvas drawing functions
-    const drawText = (ctx, text, x, y, fontSize, fontWeight, fontFamily, color, textAlign = 'left', maxWidth = null) => {
-      ctx.fillStyle = color;
-      ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-      ctx.textAlign = textAlign;
-      ctx.textBaseline = 'top';
+      const infoBar = document.getElementById('p_info_bar');
+      const colorInput = document.getElementById('inp_color').value;
       
-      if (maxWidth) {
-        const words = text.split(' ');
-        let line = '';
-        let lineY = y;
-        const lineHeight = fontSize * 1.4;
-
-        words.forEach((word, idx) => {
-          const testLine = line + (line ? ' ' : '') + word;
-          const metrics = ctx.measureText(testLine);
-          
-          if (metrics.width > maxWidth && line) {
-            ctx.fillText(line, x, lineY, maxWidth);
-            line = word;
-            lineY += lineHeight;
-          } else {
-            line = testLine;
-          }
-        });
-        if (line) ctx.fillText(line, x, lineY, maxWidth);
+      // Update indicator
+      document.getElementById('layoutIndicator').textContent = `Layout ${layoutNum}`;
+      document.getElementById('layoutCounter').textContent = `${layoutNum} / 9`;
+      
+      // Update slider active state
+      document.querySelectorAll('.layout-slider-item').forEach(item => {
+        item.classList.toggle('active', parseInt(item.dataset.layout) === layoutNum);
+      });
+      
+      // Scroll slider to center active item
+      const activeSlide = document.querySelector(`.layout-slider-item[data-layout="${layoutNum}"]`);
+      if (activeSlide) {
+        activeSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+      
+      // Remove all layout classes
+      canvas.classList.remove('layout-1', 'layout-2', 'layout-3', 'layout-4', 'layout-5', 'layout-6', 'layout-7', 'layout-8', 'layout-9');
+      
+      // Hide side images by default
+      document.getElementById('p_side_image_left').style.display = 'none';
+      document.getElementById('p_side_image_center').style.display = 'none';
+      document.getElementById('p_side_image_right').style.display = 'none';
+      
+      // Reset info bar border
+      infoBar.style.borderBottom = 'none';
+      
+      // Add new layout class
+      if (layoutNum !== 1) {
+        canvas.classList.add(`layout-${layoutNum}`);
       } else {
-        ctx.fillText(text, x, y);
-      }
-    };
-
-    const drawImage = (ctx, img, x, y, width, height, borderRadius = 0) => {
-      if (!img) return;
-      
-      if (borderRadius > 0) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(x + borderRadius, y);
-        ctx.lineTo(x + width - borderRadius, y);
-        ctx.quadraticCurveTo(x + width, y, x + width, y + borderRadius);
-        ctx.lineTo(x + width, y + height - borderRadius);
-        ctx.quadraticCurveTo(x + width, y + height, x + width - borderRadius, y + height);
-        ctx.lineTo(x + borderRadius, y + height);
-        ctx.quadraticCurveTo(x, y + height, x, y + height - borderRadius);
-        ctx.lineTo(x, y + borderRadius);
-        ctx.quadraticCurveTo(x, y, x + borderRadius, y);
-        ctx.closePath();
-        ctx.clip();
+        canvas.classList.add('layout-1');
       }
       
-      ctx.drawImage(img, x, y, width, height);
-      
-      if (borderRadius > 0) {
-        ctx.restore();
+      // If layout 8, apply color to bottom border
+      if (layoutNum === 8) {
+        infoBar.style.borderBottom = `50px solid ${colorInput}`;
+        const anchorLine = document.getElementById('p_layout8_line');
+        if (anchorLine) {
+          anchorLine.style.backgroundColor = colorInput;
+          anchorLine.style.display = 'block';
+        }
+      } else {
+        const anchorLine = document.getElementById('p_layout8_line');
+        if (anchorLine) {
+          anchorLine.style.display = 'none';
+        }
       }
-    };
-
-    // Render poster on canvas
-    const renderPoster = async (layout) => {
-      const c = document.createElement('canvas');
-      c.width = CANVAS_WIDTH * SCALE;
-      c.height = CANVAS_HEIGHT * SCALE;
-      const ctx = c.getContext('2d');
-      ctx.scale(SCALE, SCALE);
-
-      // Background
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-      const headline = document.getElementById('inp_headline').value;
-      const sub = document.getElementById('inp_sub').value;
-      const desc1 = document.getElementById('inp_desc1').value;
-      const desc2 = document.getElementById('inp_desc2').value;
-      const info = document.getElementById('inp_info').value;
-      const tagline = document.getElementById('inp_tagline').value;
-      const color = document.getElementById('inp_color').value;
-
-      // Load fresh images for canvas
-      const heroImg = data.image ? await loadImage(data.image) : null;
-      const logoImg = data.logo ? await loadImage(data.logo) : null;
-
-      // Render based on layout
-      if (layout === '1') {
-        // Layout 1: Full Width
-        drawText(ctx, tagline, 40, 40, 12, 'normal', 'Space Mono', color);
-        drawText(ctx, headline, 40, 50, 140 * SCALE / SCALE, '900', 'Playfair Display', color, 'left', 1000);
-        drawText(ctx, sub, 40, 380, 26, '700', 'DM Sans', '#1f2937');
-        
-        if (heroImg) drawImage(ctx, heroImg, 40, 490, 1000, 540, 20);
-        
-        drawText(ctx, info, 540, 1125, 12, 'normal', 'Space Mono', '#1f2937');
-        drawText(ctx, desc1, 40, 1175, 16, '300', 'DM Sans', '#374151', 'left', 450);
-        drawText(ctx, desc2, 590, 1175, 16, '300', 'DM Sans', '#374151', 'left', 450);
-        
-        if (logoImg) drawImage(ctx, logoImg, 920, 1280, 120, 38);
-      } else if (layout === '2') {
-        // Layout 2: 50-50 Split
-        drawText(ctx, tagline, 40, 40, 12, 'normal', 'Space Mono', color);
-        
-        if (heroImg) drawImage(ctx, heroImg, 580, 40, 460, 1270, 12);
-        
-        drawText(ctx, headline, 40, 760, 88, '900', 'Playfair Display', color, 'left', 450);
-        drawText(ctx, sub, 40, 960, 20, '700', 'DM Sans', '#1f2937', 'left', 450);
-        drawText(ctx, desc1, 40, 1030, 14, '300', 'DM Sans', '#374151', 'left', 450);
-        drawText(ctx, info, 40, 1280, 12, 'normal', 'Space Mono', '#1f2937');
-        
-        if (logoImg) drawImage(ctx, logoImg, 40, 1280, 120, 38);
-      } else if (layout === '3') {
-        // Layout 3: Image Top
-        if (heroImg) drawImage(ctx, heroImg, 40, 20, 1000, 600, 20);
-        
-        drawText(ctx, headline, 40, 700, 120, '900', 'Playfair Display', color, 'left', 1000);
-        drawText(ctx, sub, 40, 970, 20, '700', 'DM Sans', '#1f2937', 'left', 1000);
-        drawText(ctx, desc1, 40, 1060, 14, '300', 'DM Sans', '#374151', 'center', 1000);
-        drawText(ctx, desc2, 40, 1090, 14, '300', 'DM Sans', '#374151', 'center', 1000);
-        drawText(ctx, tagline, 40, 1280, 11, 'normal', 'Space Mono', color);
-        
-        if (logoImg) drawImage(ctx, logoImg, 920, 1280, 120, 38);
-      } else if (layout === '4') {
-        // Layout 4: Diagonal
-        if (heroImg) drawImage(ctx, heroImg, 40, 40, 450, 800, 20);
-        
-        drawText(ctx, tagline, 595, 40, 12, 'normal', 'Space Mono', color);
-        drawText(ctx, headline, 595, 400, 96, '900', 'Playfair Display', color, 'left', 445);
-        drawText(ctx, sub, 595, 700, 18, '700', 'DM Sans', '#1f2937', 'left', 445);
-        drawText(ctx, desc1, 595, 800, 13, '300', 'DM Sans', '#374151', 'left', 445);
-        drawText(ctx, desc2, 595, 840, 13, '300', 'DM Sans', '#374151', 'left', 445);
-        drawText(ctx, info, 595, 1280, 12, 'normal', 'Space Mono', '#1f2937');
-        
-        if (logoImg) drawImage(ctx, logoImg, 920, 1280, 120, 38);
-      } else if (layout === '5') {
-        // Layout 5: Centered
-        drawText(ctx, tagline, 540, 20, 11, 'normal', 'Space Mono', color, 'center');
-        
-        if (heroImg) drawImage(ctx, heroImg, 240, 50, 600, 500, 24);
-        
-        drawText(ctx, headline, 40, 590, 110, '900', 'Playfair Display', color, 'center', 1000);
-        drawText(ctx, sub, 40, 827, 19, '700', 'DM Sans', '#1f2937', 'center', 1000);
-        drawText(ctx, desc1, 40, 888, 20, '300', 'DM Sans', '#374151', 'center', 1000);
-        drawText(ctx, desc2, 40, 933, 20, '300', 'DM Sans', '#374151', 'center', 1000);
-        drawText(ctx, info, 540, 1280, 12, 'normal', 'Space Mono', '#1f2937', 'center');
-        
-        if (logoImg) drawImage(ctx, logoImg, 480, 1280, 120, 38);
-      }
-
-      return c.toDataURL('image/png');
-    };
-
-    // Export PNG
-    document.getElementById('exportBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('exportBtn');
-      const status = document.getElementById('status');
       
-      btn.disabled = true;
-      btn.textContent = 'Exporting...';
-      status.className = 'status';
+      // If layout 6 and visual already uploaded, show left and right images
+      if (layoutNum === 6 && lastUploadedImage) {
+        document.getElementById('p_side_image_left').src = lastUploadedImage;
+        document.getElementById('p_side_image_left').style.display = 'block';
+        document.getElementById('p_side_image_right').src = lastUploadedImage;
+        document.getElementById('p_side_image_right').style.display = 'block';
+      }
+      
+      // If layout 7 and visual already uploaded, show left and right images
+      if (layoutNum === 7 && lastUploadedImage) {
+        document.getElementById('p_side_image_left').src = lastUploadedImage;
+        document.getElementById('p_side_image_left').style.display = 'block';
+        document.getElementById('p_side_image_right').src = lastUploadedImage;
+        document.getElementById('p_side_image_right').style.display = 'block';
+      }
+    }
+    
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (currentLayout < 9) updateLayout(currentLayout + 1);
+    });
+    
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (currentLayout > 1) updateLayout(currentLayout - 1);
+    });
 
-      try {
-        const layout = document.getElementById('inp_layout').value;
-        const dataUrl = await renderPoster(layout);
-
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = `poster-layout-${layout}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        status.textContent = '✓ Poster exported successfully!';
-        status.className = 'status success';
-      } catch (err) {
-        console.error('Export error:', err);
-        status.textContent = '✗ Export failed. Try again!';
-        status.className = 'status error';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Export as PNG';
+    // Touch swipe support on poster wrapper
+    const posterWrapper = document.getElementById('posterWrapper');
+    posterWrapper.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    });
+    
+    posterWrapper.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      if (touchStartX - touchEndX > 50 && currentLayout < 9) {
+        updateLayout(currentLayout + 1);
+      } else if (touchEndX - touchStartX > 50 && currentLayout > 1) {
+        updateLayout(currentLayout - 1);
       }
     });
 
-    // Initial update
-    updateDisplay();
+    // --- Live bindings ---
+    const bind = (inputId, posterId, prop = 'textContent') => {
+      document.getElementById(inputId).addEventListener('input', (e) => {
+        document.getElementById(posterId)[prop] = e.target.value;
+      });
+    };
+
+    // Bind with special handling for headline
+    document.getElementById('inp_judul').addEventListener('input', (e) => {
+      document.getElementById('p_headline').textContent = e.target.value;
+    });
+
+    bind('inp_sub_judul', 'p_sub');
+    bind('inp_info', 'p_info');
+    bind('inp_desc1', 'p_desc1');
+    bind('inp_desc2', 'p_desc2');
+    bind('inp_tagline', 'p_tagline');
+
+    // Color
+    document.getElementById('inp_color').addEventListener('input', (e) => {
+      const c = e.target.value;
+      document.getElementById('color_label').textContent = c.toUpperCase();
+      document.getElementById('p_headline').style.color = c;
+      document.getElementById('p_tagline').style.color = c;
+      // If layout 8, apply color to bottom border
+      const infoBar = document.getElementById('p_info_bar');
+      const anchorLine = document.getElementById('p_layout8_line');
+      if (currentLayout === 8) {
+        infoBar.style.borderBottom = `3px solid ${c}`;
+        if (anchorLine) {
+          anchorLine.style.backgroundColor = c;
+        }
+      }
+    });
+
+    // File uploads
+    function setupUpload(dropId, fileId, labelId, onLoad) {
+      const drop = document.getElementById(dropId);
+      const file = document.getElementById(fileId);
+      const label = document.getElementById(labelId);
+      drop.addEventListener('click', () => file.click());
+      file.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          label.textContent = f.name.slice(0, 20);
+          onLoad(ev.target.result);
+        };
+        reader.readAsDataURL(f);
+      });
+    }
+
+    setupUpload('drop_visual', 'file_visual', 'visual_label', (dataUrl) => {
+      try {
+        lastUploadedImage = dataUrl;
+        const hero = document.getElementById('p_hero');
+        hero.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;" alt="Hero Image">`;
+        
+        // For Layout 6: populate left and right images
+        if (currentLayout === 6) {
+          document.getElementById('p_side_image_left').src = dataUrl;
+          document.getElementById('p_side_image_left').style.display = 'block';
+          document.getElementById('p_side_image_right').src = dataUrl;
+          document.getElementById('p_side_image_right').style.display = 'block';
+        }
+        
+        // For Layout 7: populate left and right circular images
+        if (currentLayout === 7) {
+          document.getElementById('p_side_image_left').src = dataUrl;
+          document.getElementById('p_side_image_left').style.display = 'block';
+          document.getElementById('p_side_image_right').src = dataUrl;
+          document.getElementById('p_side_image_right').style.display = 'block';
+        }
+      } catch (e) {
+        console.error('Image upload error:', e);
+      }
+    });
+
+    setupUpload('drop_logo', 'file_logo', 'logo_label', (dataUrl) => {
+      const brand = document.getElementById('p_brand');
+      brand.innerHTML = `<img src="${dataUrl}" style="height:36px;width:auto;">`;
+    });
+
+    // --- Poster scaling ---
+    function scalePoster() {
+      const wrapper = document.getElementById('posterWrapper');
+      const available = Math.min(window.innerWidth - 48, 900);
+      const scale = Math.min(available / 1080, 0.55);
+      wrapper.style.transform = `scale(${scale})`;
+      wrapper.style.width = '1080px';
+      wrapper.style.height = `${1350 * scale}px`;
+    }
+
+    window.addEventListener('resize', scalePoster);
+    scalePoster();
+
+    // Export PNG handler
+    document.getElementById('downloadPngBtn').addEventListener('click', () => {
+      const data = {
+        headline: document.getElementById('p_headline').textContent,
+        sub: document.getElementById('p_sub').textContent,
+        desc1: document.getElementById('p_desc1').textContent,
+        desc2: document.getElementById('p_desc2').textContent,
+        info: document.getElementById('p_info').textContent,
+        tagline: document.getElementById('p_tagline').textContent,
+        color: document.getElementById('inp_color').value,
+        layout: currentLayout,
+        image: document.querySelector('#p_hero img')?.src || null,
+        logo: document.querySelector('#p_brand img')?.src || null
+      };
+      const encoded = encodeURIComponent(JSON.stringify(data));
+     window.open(`/layoutsystem/export.html?data=${encoded}`, '_blank');
+    });
+
+
+    // Init
+    generateLayoutSlider();
+    lucide.createIcons();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9e1b9bd1aca8e4',t:'MTc3NTc4NTkwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9e076b843487c6',t:'MTc3NTc4NTA3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
