@@ -1408,22 +1408,40 @@
     scalePoster();
 
     // Export PNG handler
-    document.getElementById('downloadPngBtn').addEventListener('click', () => {
-      const data = {
-        headline: document.getElementById('p_headline').textContent,
-        sub: document.getElementById('p_sub').textContent,
-        desc1: document.getElementById('p_desc1').textContent,
-        desc2: document.getElementById('p_desc2').textContent,
-        info: document.getElementById('p_info').textContent,
-        tagline: document.getElementById('p_tagline').textContent,
-        color: document.getElementById('inp_color').value,
-        layout: currentLayout,
-        image: document.querySelector('#p_hero img')?.src || null,
-        logo: document.querySelector('#p_brand img')?.src || null
-      };
-      localStorage.setItem('exportData', JSON.stringify(data));
-window.open('/layoutsystem/export.html', '_blank');
+    document.getElementById('downloadPngBtn').addEventListener('click', async () => {
+  const el = document.getElementById('posterCanvas');
+
+  // simpan kondisi preview
+  const originalTransform = el.style.transform;
+  const originalWidth = el.style.width;
+  const originalHeight = el.style.height;
+
+  // reset ke ukuran asli (WAJIB)
+  el.style.transform = 'none';
+  el.style.width = '1080px';
+  el.style.height = '1350px';
+
+  try {
+    const canvas = await html2canvas(el, {
+      scale: 3,
+      useCORS: true,
+      backgroundColor: '#ffffff'
     });
+
+    const link = document.createElement('a');
+    link.download = `poster-layout-${currentLayout}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+  } catch (err) {
+    console.error(err);
+  }
+
+  // balikin ke preview
+  el.style.transform = originalTransform;
+  el.style.width = originalWidth;
+  el.style.height = originalHeight;
+});
 
 
     // Init
